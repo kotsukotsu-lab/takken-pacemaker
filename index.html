@@ -2,24 +2,30 @@
 <html lang="ja">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex">
 <title>宅建ペースメーカー</title>
-<meta name="description" content="宅建試験の学習記録・復習支援ツール。問題文は持たず、公式PDFへリンクします。令和5〜7年度の150問に論点つき。登録不要。">
+<meta name="description" content="宅建試験の学習記録・復習支援ツール。今日やる10問を自動で組み、勘で正解した問題まで拾って復習に回します。登録不要。">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="theme-color" content="#1a4fa0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="宅建ペース">
 
-<!-- SNSに貼ったときの見た目。noindex は検索よけで、リンクプレビューとは別 -->
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://kotsukotsu-lab.github.io/takken-pacemaker/">
 <meta property="og:site_name" content="宅建ペースメーカー">
 <meta property="og:locale" content="ja_JP">
 <meta property="og:title" content="宅建ペースメーカー ── 試験日まで、今日やる10問だけ。">
-<meta property="og:description" content="過去問サイトではありません。問題文は持たず公式PDFへリンクし、解答の記録と復習の管理だけを担当します。令和5〜7年度の150問に論点つき。翌日→3日後→7日後の間隔で復習。登録不要。">
+<meta property="og:description" content="過去問サイトではありません。今日やる10問を自動で組み、勘で正解した問題まで拾って復習に回します。登録不要。">
 <meta property="og:image" content="https://kotsukotsu-lab.github.io/takken-pacemaker/ogp.jpg">
 <meta property="og:image:type" content="image/jpeg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="宅建ペースメーカー。試験日まで、今日やる10問だけ。">
 <meta name="twitter:card" content="summary_large_image">
+
 <style>
   :root{
     --bg:#eef2f7; --panel:#ffffff; --line:#dde5ee; --ink:#1e2a38; --dim:#6b7a8c;
@@ -39,456 +45,256 @@
   html,body{margin:0;padding:0}
   body{
     background:var(--bg); color:var(--ink);
-    font-family:"Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,system-ui,sans-serif;
-    line-height:1.7; -webkit-text-size-adjust:100%;
+    font-family:"Hiragino Sans","Hiragino Kaku Gothic ProN","Noto Sans JP",system-ui,sans-serif;
+    line-height:1.75; font-size:16px;
+    -webkit-text-size-adjust:100%;
+    padding-bottom:calc(72px + env(safe-area-inset-bottom));
   }
-  .wrap{max-width:1080px;margin:0 auto;padding:0 16px 56px}
-  svg{flex:none}
+  .wrap{max-width:680px;margin:0 auto;padding:0 14px}
+  h1,h2,h3{line-height:1.4;margin:0}
+  a{color:var(--blue)}
+  .hide{display:none !important}
+  .muted{color:var(--dim);font-size:.86rem;line-height:1.6}
 
-  /* ---- ヘッダ ---- */
-  .topbar{background:var(--panel);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5}
-  .topbar .inner{max-width:1080px;margin:0 auto;padding:12px 16px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
-  .logo{display:flex;align-items:center;gap:10px}
-  .logo .mark{width:34px;height:34px;border-radius:10px;background:linear-gradient(140deg,var(--blue),var(--teal));
-    display:flex;align-items:center;justify-content:center}
-  .logo b{display:block;font-size:17px;line-height:1.3}
-  .logo small{display:block;font-size:11px;color:var(--dim)}
+  /* ── ヘッダ ── */
+  header{background:var(--blue);color:#fff;padding:14px 0 12px;padding-top:calc(14px + env(safe-area-inset-top))}
+  header .wrap{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+  header .ttl{font-weight:700;font-size:1.02rem;letter-spacing:.02em}
+  header .cd{margin-left:auto;font-size:.84rem;opacity:.92}
+  header .cd b{font-size:1.15rem;font-weight:700}
 
-  nav{display:flex;gap:2px;margin-left:auto;overflow-x:auto;-webkit-overflow-scrolling:touch}
-  nav button{background:none;border:none;font:inherit;color:var(--dim);padding:9px 13px;border-radius:9px;
-    white-space:nowrap;display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer}
-  nav button:hover{background:var(--tint);color:var(--ink)}
-  nav button[aria-current=page]{color:var(--blue);font-weight:700;background:var(--tint)}
+  /* ── カード ── */
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:16px;margin:14px 0}
+  .card h2{font-size:1rem;margin-bottom:10px}
+  .card h3{font-size:.92rem;margin:16px 0 8px;color:var(--dim)}
 
-  /* ---- 部品 ---- */
-  .grid{display:grid;gap:14px;margin-top:14px}
-  @media(min-width:860px){ .grid.two{grid-template-columns:minmax(0,1fr) minmax(0,1.15fr)} }
-  .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:18px}
-  .card h2{display:flex;align-items:center;gap:8px;font-size:15px;margin:0 0 14px}
-  .card h2 .sub{font-size:11px;color:var(--dim);font-weight:400}
-  .muted{color:var(--dim);font-size:12px}
+  /* ── ボタン ── */
+  button{font-family:inherit;font-size:1rem;line-height:1.5;cursor:pointer}
+  .btn{display:block;width:100%;border:0;border-radius:12px;padding:15px 14px;
+       background:var(--blue);color:var(--on-fill);font-weight:700;text-align:center}
+  .btn.sub{background:var(--panel);color:var(--ink);border:1px solid var(--line);font-weight:600}
+  .btn.teal{background:var(--teal)}
+  .btn:disabled{opacity:.45}
+  .btn.danger{background:transparent;color:var(--ng);border:1px solid var(--ng);font-weight:600}
+  .btns{display:grid;gap:10px}
+  .btns.two{grid-template-columns:1fr 1fr}
 
-  button{font:inherit;cursor:pointer;border:none;border-radius:10px}
-  button:active{opacity:.75}
-  .fill{background:var(--blue);color:var(--on-fill);font-weight:700;padding:14px 20px;font-size:15px;width:100%}
-  .outline{background:transparent;color:var(--ink);border:1px solid var(--line);padding:11px 16px;font-size:14px}
-  .outline:hover{border-color:var(--blue);color:var(--blue)}
+  /* ── ダッシュボード ── */
+  .score{display:flex;align-items:flex-end;gap:12px;flex-wrap:wrap}
+  .score .num{font-size:2.5rem;font-weight:700;line-height:1;color:var(--blue)}
+  .score .unit{font-size:1rem;color:var(--dim)}
+  .gap{background:var(--tint);border-radius:10px;padding:10px 12px;margin-top:12px;font-size:.9rem}
+  .plan{display:grid;gap:6px;margin:12px 0}
+  .plan div{display:flex;justify-content:space-between;font-size:.9rem;border-bottom:1px dashed var(--line);padding-bottom:5px}
+  .plan span:last-child{color:var(--dim)}
 
-  /* ---- ヒーロー ---- */
-  .hero{background:linear-gradient(135deg,#123a7d 0%,#1a5bb5 55%,#1379a8 100%);
-    color:#fff;border-radius:var(--radius);padding:22px;display:grid;gap:18px}
-  @media(min-width:560px){ .hero{grid-template-columns:auto 1fr;align-items:center} }
-  .ring{width:150px;height:150px;border-radius:50%;border:7px dotted rgba(255,255,255,.35);
-    display:flex;flex-direction:column;align-items:center;justify-content:center;margin:0 auto}
-  .ring .cap{font-size:11px;opacity:.85}
-  .ring .n{font-size:46px;font-weight:700;line-height:1;font-variant-numeric:tabular-nums}
-  .ring .n em{font-size:15px;font-style:normal;margin-left:2px}
-  .hero .lead{font-size:17px;font-weight:700;margin:0}
-  .hero .leadsub{font-size:12px;opacity:.85;margin:2px 0 14px}
-  .plan{background:rgba(255,255,255,.14);border-radius:11px;padding:13px 15px;margin-bottom:14px}
-  .plan .pct{font-size:27px;font-weight:700;line-height:1.2;font-variant-numeric:tabular-nums}
-  .plan .pct .lbl{font-size:12px;font-weight:400;margin-left:4px}
-  .track{height:7px;background:rgba(255,255,255,.25);border-radius:4px;overflow:hidden;margin:7px 0 6px}
-  .track i{display:block;height:100%;background:#5ee0c8}
-  .plan .note{font-size:11px;opacity:.85}
-  .hero .fill{background:rgba(255,255,255,.95);color:var(--blue-ink)}
+  .bars{display:grid;gap:9px;margin-top:6px}
+  .bar{font-size:.88rem}
+  .bar .row{display:flex;justify-content:space-between;gap:8px;margin-bottom:3px}
+  .bar .row span:last-child{color:var(--dim);white-space:nowrap}
+  .bar .track{height:7px;background:var(--line);border-radius:4px;overflow:hidden}
+  .bar .fill{height:100%;background:var(--teal);border-radius:4px}
+  .bar .fill.low{background:var(--ng)}
+  .bar .fill.mid{background:var(--warn)}
 
-  /* ---- タイル ---- */
-  .tiles{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
-  @media(min-width:560px){ .tiles{grid-template-columns:repeat(4,1fr)} }
-  .tile{border:1px solid var(--line);border-radius:11px;padding:12px;background:var(--panel)}
-  .tile .k{font-size:11px;color:var(--dim)}
-  .tile .v{font-size:24px;font-weight:700;line-height:1.25;font-variant-numeric:tabular-nums}
-  .tile .v small{font-size:12px;font-weight:400;color:var(--dim);margin-left:2px}
-  .tile.b{background:var(--tint)}
-  .tile.b .v{color:var(--blue)}
-  .tile.w .v{color:var(--warn);font-size:18px;line-height:1.4}
+  /* ── 演習 ── */
+  .qmeta{display:flex;gap:8px;flex-wrap:wrap;font-size:.8rem;color:var(--dim);margin-bottom:10px}
+  .tag{background:var(--tint);color:var(--blue-ink);border-radius:999px;padding:2px 10px;font-weight:600}
+  .tag.warnt{background:transparent;border:1px solid var(--warn);color:var(--warn)}
+  .qtext{font-size:1.02rem;line-height:1.85;margin:6px 0 16px;white-space:pre-wrap}
+  .choices{display:grid;gap:9px}
+  .choice{display:flex;gap:11px;text-align:left;width:100%;background:var(--panel);
+          border:1.5px solid var(--line);border-radius:12px;padding:13px;color:var(--ink)}
+  .choice .n{flex:0 0 26px;height:26px;border-radius:50%;background:var(--tint);
+             color:var(--blue-ink);font-weight:700;display:grid;place-items:center;font-size:.9rem}
+  .choice.on{border-color:var(--blue);background:var(--tint)}
+  .choice.on .n{background:var(--blue);color:var(--on-fill)}
+  .choice.right{border-color:var(--ok)} .choice.right .n{background:var(--ok);color:#fff}
+  .choice.wrong{border-color:var(--ng)} .choice.wrong .n{background:var(--ng);color:#fff}
 
-  /* 何が問われている問題か。原文ではなく、こちらで付けた分類 */
-  .topic{font-size:17px;font-weight:700;color:var(--blue);margin:-4px 0 2px;line-height:1.5}
+  .conf{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:14px}
+  .conf button{border:1.5px solid var(--blue);background:var(--panel);color:var(--blue);
+               border-radius:12px;padding:13px 4px;font-weight:700;font-size:.92rem}
+  .conf button small{display:block;font-weight:500;font-size:.72rem;color:var(--dim);margin-top:2px}
+  .conf.ox{grid-template-columns:1fr 1fr}
+  .conf.ox button.o{border-color:var(--ok);color:var(--ok)}
+  .conf.ox button.x{border-color:var(--ng);color:var(--ng)}
 
-  /* ---- 公式PDF ---- */
-  .pdfcard{border-left:3px solid var(--blue)}
-  .openpdf{display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;
-    background:var(--blue);color:var(--on-fill);border-radius:10px;padding:15px;font-weight:700;font-size:15px}
-  .openpdf:hover{opacity:.9}
+  .verdict{display:flex;align-items:center;gap:12px;margin:4px 0 12px}
+  .verdict .mark{font-size:2.2rem;line-height:1;font-weight:700}
+  .verdict.ok .mark{color:var(--ok)} .verdict.ng .mark{color:var(--ng)}
+  .verdict .lead{font-weight:700}
+  .verdict .sub{font-size:.84rem;color:var(--dim);font-weight:400}
 
-  /* ---- 解答 ---- */
-  .keys{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-bottom:12px}
-  .keys button{background:var(--panel);border:1.5px solid var(--line);color:var(--ink);padding:16px 0;font-size:19px;font-weight:700}
-  .keys button:hover:not(:disabled){border-color:var(--blue);color:var(--blue)}
-  .keys button[aria-pressed=true]{border-color:var(--blue);background:var(--tint);color:var(--blue)}
-  .keys button:disabled{cursor:default}
-  .keys button.was-ok{background:var(--ok);border-color:var(--ok);color:#fff}
-  .keys button.was-ng{background:var(--ng);border-color:var(--ng);color:#fff}
-  .keys button.answer{border-color:var(--ok);color:var(--ok)}
-  .recall{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
-  .recall button{background:var(--panel);border:1.5px solid var(--line);color:var(--ink);
-    padding:15px 4px;font-size:12px;line-height:1.5;display:flex;flex-direction:column;align-items:center;gap:2px}
-  .recall button b{font-size:23px;line-height:1.1}
-  .recall button:hover:not(:disabled){border-color:var(--blue);color:var(--blue)}
-  .recall button:disabled{cursor:default;opacity:.45}
-  .recall button.chosen{opacity:1;background:var(--tint);border-color:var(--blue);color:var(--blue)}
-  .result{border-top:1px solid var(--line);margin-top:14px;padding-top:14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-  .result .verdict{font-size:17px;font-weight:700}
-  .result .verdict.ok{color:var(--ok)} .result .verdict.ng{color:var(--ng)}
-  .result .when{font-size:12px;color:var(--dim);margin-left:auto}
+  .reasons{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0}
+  .reasons button{border:1px solid var(--line);background:var(--panel);color:var(--ink);
+                  border-radius:10px;padding:11px 8px;font-size:.88rem}
+  .reasons button.on{border-color:var(--blue);background:var(--tint);font-weight:700}
 
-  /* ---- 復習キュー ---- */
-  .queue{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-  .qbox{border:1px solid var(--line);border-radius:11px;padding:13px;text-align:center;background:var(--tint)}
-  .qbox .k{font-size:12px;color:var(--blue);font-weight:700}
-  .qbox .v{font-size:25px;font-weight:700;font-variant-numeric:tabular-nums}
-  .qbox .v small{font-size:11px;font-weight:400;color:var(--dim)}
-  .qbox .c{font-size:10px;color:var(--dim)}
+  .note{border-left:3px solid var(--teal);background:var(--tint);padding:10px 12px;
+        border-radius:0 8px 8px 0;font-size:.92rem;margin:10px 0}
+  .note.trap{border-left-color:var(--warn)}
+  .note b{display:block;font-size:.78rem;color:var(--dim);margin-bottom:2px;font-weight:700}
 
-  /* ---- 分野バー ---- */
-  .bar{display:flex;align-items:center;gap:10px;margin-bottom:10px;font-size:13px}
-  .bar .name{width:7em;flex:none}
-  .bar .t{flex:1;height:8px;background:var(--line);border-radius:5px;overflow:hidden}
-  .bar .t i{display:block;height:100%;background:var(--teal)}
-  .bar .t i.low{background:var(--ng)}
-  .bar .val{width:3.4em;text-align:right;font-variant-numeric:tabular-nums;font-weight:700}
+  .prog{height:5px;background:var(--line);border-radius:3px;overflow:hidden;margin-bottom:12px}
+  .prog i{display:block;height:100%;background:var(--blue)}
 
-  /* ---- 記録 ---- */
-  .stats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
-  @media(min-width:560px){ .stats{grid-template-columns:repeat(4,1fr)} }
-  .stat{border:1px solid var(--line);border-radius:11px;padding:13px}
-  .stat .k{font-size:11px;color:var(--dim)}
-  .stat .v{font-size:26px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.25}
-  .stat .v small{font-size:12px;font-weight:400;color:var(--dim)}
+  .list{display:grid;gap:8px}
+  .row{display:flex;gap:10px;align-items:center;border:1px solid var(--line);
+       border-radius:10px;padding:10px 12px;background:var(--panel);font-size:.9rem}
+  .row .id{font-weight:700;flex:0 0 auto;font-size:.82rem;color:var(--blue-ink)}
+  .row .tp{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .row .st{flex:0 0 auto;font-size:.78rem;color:var(--dim)}
 
-  /* ---- 一覧 ---- */
-  .rows{border-top:1px solid var(--line)}
-  .row{display:flex;align-items:center;gap:10px;padding:11px 2px;border-bottom:1px solid var(--line);font-size:14px}
-  .row .d{font-size:12px;color:var(--dim);margin-left:auto;font-variant-numeric:tabular-nums}
-  .chip{font-size:11px;padding:2px 9px;border-radius:99px;border:1px solid var(--line);color:var(--dim);white-space:nowrap}
-  .chip.rev{border-color:var(--blue);color:var(--blue)}
-  .chip.ok{border-color:var(--ok);color:var(--ok)}
-  .chip.ng{border-color:var(--ng);color:var(--ng)}
-  .filters{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:12px}
-  .filters button{background:var(--panel);border:1px solid var(--line);color:var(--dim);
-    padding:6px 13px;font-size:12px;border-radius:99px}
-  .filters button[aria-pressed=true]{background:var(--tint);border-color:var(--blue);color:var(--blue);font-weight:700}
-  a.row{text-decoration:none;color:inherit}
-  a.row:hover{background:var(--tint)}
-  .row .t{flex:1;min-width:0}
-  .row .t b{display:block;font-size:14px;font-weight:600}
-  .row .t span{display:block;font-size:11px;color:var(--dim)}
+  .star{background:none;border:0;font-size:1.3rem;line-height:1;padding:4px 6px;color:var(--dim)}
+  .star.on{color:var(--warn)}
 
-  /* ---- 帯 ---- */
-  .banner{background:linear-gradient(90deg,#1a4fa0,#0f9e94);color:#fff;border-radius:var(--radius);
-    padding:20px;margin-top:16px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
-  .banner b{font-size:17px;display:block}
-  .banner span{font-size:12px;opacity:.9}
-  .steps{display:flex;align-items:center;gap:6px;margin-left:auto;flex-wrap:wrap}
-  .step{font-size:11px;text-align:center;opacity:.75}
-  .step.on{opacity:1;font-weight:700}
-  .step i{display:block;width:22px;height:22px;border-radius:50%;border:2px solid rgba(255,255,255,.6);margin:0 auto 3px}
-  .step.on i{background:rgba(255,255,255,.9);border-color:#fff}
+  /* ── 下部ナビ ── */
+  nav{position:fixed;left:0;right:0;bottom:0;background:var(--panel);border-top:1px solid var(--line);
+      padding-bottom:env(safe-area-inset-bottom);z-index:20}
+  nav .wrap{display:grid;grid-template-columns:repeat(5,1fr);padding:0}
+  nav button{background:none;border:0;padding:9px 2px 8px;color:var(--dim);font-size:.68rem;
+             display:grid;gap:2px;justify-items:center;line-height:1.3}
+  nav button .ic{font-size:1.18rem;line-height:1}
+  nav button.on{color:var(--blue);font-weight:700}
 
-  footer{margin-top:22px;font-size:12px;color:var(--dim)}
-  .notice{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:15px;line-height:1.8}
-  .notice a{color:var(--blue)}
-  .settings label{display:block;margin:0 0 12px;font-size:14px}
-  .settings input[type=date]{background:var(--bg);border:1px solid var(--line);color:var(--ink);
-    border-radius:9px;padding:9px 11px;font:inherit;margin-left:10px}
-  .danger{background:transparent;border:1px solid var(--ng);color:var(--ng);padding:10px 16px;font-size:13px}
-  .hide{display:none}
+  footer{margin:26px 0 10px}
+  .notice{font-size:.78rem;color:var(--dim);line-height:1.7;border-top:1px solid var(--line);padding-top:14px}
+  .notice strong{color:var(--ink)}
+  input[type=date],textarea{font-family:inherit;font-size:1rem;padding:9px;border:1px solid var(--line);
+       border-radius:9px;background:var(--panel);color:var(--ink);width:100%}
+  label{display:block;font-size:.9rem;margin-bottom:14px}
+  label input{margin-top:5px}
+  .badge{display:inline-block;background:var(--tint);color:var(--blue-ink);border-radius:999px;
+         padding:3px 11px;font-size:.8rem;font-weight:700;margin:0 6px 6px 0}
 </style>
 </head>
 <body>
 
-<div class="topbar">
-  <div class="inner">
-    <div class="logo">
-      <span class="mark">
-        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round">
-          <circle cx="12" cy="13" r="8"/><path d="M12 13V9"/><path d="M9 2h6"/>
-        </svg>
-      </span>
-      <span>
-        <b>宅建ペースメーカー</b>
-        <small>試験日まで、今日やる10問だけ。</small>
-      </span>
-    </div>
-    <nav id="nav">
-      <button data-view="home" aria-current="page">ホーム</button>
-      <button data-view="study">今日の学習</button>
-      <button data-view="review">復習</button>
-      <button data-view="oq">一問一答</button>
-      <button data-view="topics">論点一覧</button>
-      <button data-view="record">学習記録</button>
-      <button data-view="config">設定</button>
-    </nav>
+<header>
+  <div class="wrap">
+    <span class="ttl">宅建ペースメーカー</span>
+    <span class="cd" id="countdown"></span>
   </div>
-</div>
+</header>
 
 <div class="wrap">
 
-<!-- ===== ホーム ===== -->
+<!-- ========== ホーム ========== -->
 <section id="view-home">
-  <div class="grid two">
-    <div class="hero">
-      <div class="ring">
-        <div class="cap">試験まであと</div>
-        <div class="n" id="cdNum">–<em>日</em></div>
-        <div class="cap" id="cdDate"></div>
-      </div>
-      <div>
-        <p class="lead" id="heroLead">今日の10問から。</p>
-        <p class="leadsub" id="heroSub"></p>
-        <div class="plan">
-          <div class="pct"><span id="planPct">0</span>%<span class="lbl">手をつけた</span></div>
-          <div class="track"><i id="planBar" style="width:0%"></i></div>
-          <div class="note" id="planNote"></div>
-        </div>
-        <button class="fill" id="startBtn">今日の10問をはじめる</button>
-      </div>
+  <div class="card">
+    <h2>いまの推定得点</h2>
+    <div class="score">
+      <span class="num" id="estScore">—</span>
+      <span class="unit" id="estRange"></span>
     </div>
-
-    <div class="card">
-      <h2>今日の学習</h2>
-      <div class="tiles">
-        <div class="tile b"><div class="k">今日の10問</div><div class="v" id="tToday">10<small>問</small></div></div>
-        <div class="tile"><div class="k">きょう出る復習</div><div class="v" id="tReview">0<small>問</small></div></div>
-        <div class="tile w"><div class="k">苦手分野</div><div class="v" id="tWeak">–</div></div>
-        <div class="tile"><div class="k">今日の進捗</div><div class="v" id="tProg">0<small>/ 10</small></div></div>
-      </div>
-      <div class="rows" style="margin-top:16px">
-        <div class="row"><span class="chip">1</span>公式PDFで問題を読む<span class="d">10問</span></div>
-        <div class="row"><span class="chip">2</span>1〜4で答え合わせ<span class="d">その場で判定</span></div>
-        <div class="row"><span class="chip">3</span>間違いは復習キューへ<span class="d">自動</span></div>
-        <div class="row"><span class="chip">4</span>翌日・3日後・7日後に再出題<span class="d">忘れる前に</span></div>
-      </div>
-    </div>
+    <div class="gap" id="estGap"></div>
+    <p class="muted" id="estBasis" style="margin:10px 0 0"></p>
   </div>
 
-  <div class="grid two">
-    <div class="card pdfcard">
-      <h2>問題文は公式PDFで確認</h2>
-      <p style="margin:0 0 14px;font-size:13px">
-        このサイトは問題文を持ちません。解答の記録と復習の管理だけを担当します。
-        問題は一般財団法人不動産適正取引推進機構の公式PDFで読んでください。
-      </p>
-      <a class="openpdf" id="pdfLink" href="https://www.retio.or.jp/exam/past_ques_ans/other/" target="_blank" rel="noopener">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-          <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><path d="M15 3h6v6"/><path d="M10 14 21 3"/>
-        </svg>
-        <span id="pdfLabel">公式の過去問ページを開く</span>
-      </a>
-      <p class="muted" style="margin:10px 0 0">公式サイトへ移動します</p>
+  <div class="card">
+    <h2>今日の10問</h2>
+    <div class="plan" id="planBreak"></div>
+    <div class="btns">
+      <button class="btn teal" id="startOx">電車で10問（一問一答 ○×）</button>
+      <button class="btn" id="startQuiz">過去問を解く（四択・PDF併読）</button>
     </div>
-
-    <div class="card">
-      <h2>復習キュー <span class="sub">間隔をあけて定着させる</span></h2>
-      <div class="queue">
-        <div class="qbox"><div class="k">明日</div><div class="v" id="q1">0<small>問</small></div><div class="c">復習予定</div></div>
-        <div class="qbox"><div class="k">3日後まで</div><div class="v" id="q3">0<small>問</small></div><div class="c">復習予定</div></div>
-        <div class="qbox"><div class="k">7日後まで</div><div class="v" id="q7">0<small>問</small></div><div class="c">復習予定</div></div>
-      </div>
-      <p class="muted" style="margin:12px 0 0" id="queueNote"></p>
-    </div>
+    <p class="muted" style="margin:10px 0 0" id="planNote"></p>
   </div>
 
-  <div class="grid two">
-    <div class="card">
-      <h2>弱点分野 <span class="sub">正答率</span></h2>
-      <div id="fieldBars"></div>
-      <p class="muted" style="margin:6px 0 0">5問以上答えた分野だけ数字を出します。</p>
-    </div>
-
-    <div class="card">
-      <h2>学習記録 <span class="sub">サマリー</span></h2>
-      <div class="stats">
-        <div class="stat"><div class="k">累計回答数</div><div class="v" id="sTotal">0<small>問</small></div></div>
-        <div class="stat"><div class="k">正答率</div><div class="v" id="sRate">–</div></div>
-        <div class="stat"><div class="k">連続学習日数</div><div class="v" id="sStreak">0<small>日</small></div></div>
-        <div class="stat"><div class="k">直近7日でやり切った日</div><div class="v" id="sWeek">0<small>/ 7</small></div></div>
-      </div>
-    </div>
+  <div class="card">
+    <h2>苦手 TOP3</h2>
+    <div class="bars" id="weak3"></div>
   </div>
 
-  <div class="banner">
-    <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round">
-      <path d="M22 2 11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/>
-    </svg>
-    <div>
-      <b>その10問が、当日の1点になる。</b>
-      <span id="bannerSub"></span>
-    </div>
-    <div class="steps" id="steps"></div>
+  <div class="card">
+    <h2>続いています</h2>
+    <div id="streakBadges"></div>
   </div>
 </section>
 
-<!-- ===== 今日の学習 ===== -->
+<!-- ========== 演習 ========== -->
 <section id="view-study" class="hide">
-  <div class="grid">
-    <div class="card">
-      <h2 id="stHead">今日の10問</h2>
-      <div class="tiles" style="grid-template-columns:repeat(2,1fr);max-width:420px">
-        <div class="tile b"><div class="k">いま何問目</div><div class="v" id="stPos">1<small>/ 10</small></div></div>
-        <div class="tile"><div class="k">ここまでの正解</div><div class="v" id="stOk">0<small>問</small></div></div>
-      </div>
-    </div>
-
-    <div class="card" id="qCard">
-      <h2>
-        <span id="qTitle">令和7年度 問1</span>
-        <span class="chip" id="qField"></span>
-        <span class="chip rev hide" id="qRev">復習</span>
-      </h2>
-      <p class="topic" id="qTopic"></p>
-      <p class="muted" style="margin:0 0 14px" id="qPage"></p>
-
-      <!-- 2周目以降。論点だけ見て思い出せるかを自己採点する -->
-      <div id="recallBody" class="hide">
-        <p style="margin:14px 0 12px;font-size:15px">この論点、いま説明できますか。</p>
-        <div class="recall" id="recall">
-          <button data-r="ok"><b>◯</b>説明できた</button>
-          <button data-r="mid"><b>△</b>あやふや</button>
-          <button data-r="ng"><b>✕</b>思い出せない</button>
-        </div>
-        <button class="outline" id="toQuiz" style="width:100%;margin-top:12px">原文を読んで4択で解く</button>
-      </div>
-
-      <!-- 初見。公式PDFで原文を読んでから4択で答える -->
-      <div id="quizBody">
-        <a class="openpdf" id="qOpen" href="#" target="_blank" rel="noopener">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><path d="M15 3h6v6"/><path d="M10 14 21 3"/>
-          </svg>
-          <span id="qOpenLabel"></span>
-        </a>
-        <p class="muted" style="margin:10px 0 16px">読み終えたら、選んだ番号を押します。</p>
-        <div class="keys" id="keys">
-          <button data-n="1" aria-pressed="false">1</button><button data-n="2" aria-pressed="false">2</button>
-          <button data-n="3" aria-pressed="false">3</button><button data-n="4" aria-pressed="false">4</button>
-        </div>
-        <button class="fill" id="checkBtn" disabled>答え合わせ</button>
-      </div>
-
-      <div class="result hide" id="resultBox">
-        <span class="verdict" id="verdict"></span>
-        <span class="muted" id="verdictSub"></span>
-        <span class="when" id="verdictWhen"></span>
-      </div>
-      <a class="outline hide" id="afterPdf" href="#" target="_blank" rel="noopener"
-         style="display:block;text-align:center;text-decoration:none;margin-top:12px">原文を確認する</a>
-      <button class="fill hide" id="nextBtn" style="margin-top:12px">つぎの問題へ</button>
-    </div>
-
-    <div class="card hide" id="doneCard">
-      <h2>今日のぶん、終わりました</h2>
-      <div class="stats">
-        <div class="stat"><div class="k">正解</div><div class="v" id="dnScore">0</div></div>
-        <div class="stat"><div class="k">今日できた率</div><div class="v" id="dnRate">–</div></div>
-        <div class="stat"><div class="k">明日に戻った</div><div class="v" id="dnQueue">0<small>問</small></div></div>
-        <div class="stat"><div class="k">連続学習日数</div><div class="v" id="dnStreak">0<small>日</small></div></div>
-      </div>
-      <p style="margin:16px 0 0;font-size:14px" id="dnNext"></p>
-    </div>
+  <div class="prog"><i id="progBar" style="width:0"></i></div>
+  <div class="card" id="qCard">
+    <div class="qmeta" id="qMeta"></div>
+    <div class="qtext" id="qText"></div>
+    <div id="qBody"></div>
   </div>
+  <div class="btns"><button class="btn sub" id="quitStudy">中断してホームへ</button></div>
 </section>
 
-<!-- ===== 復習 ===== -->
+<!-- ========== 復習 ========== -->
 <section id="view-review" class="hide">
   <div class="card">
-    <h2>復習の予定</h2>
-    <div class="queue">
-      <div class="qbox"><div class="k">きょう出る</div><div class="v" id="rvToday">0<small>問</small></div><div class="c">次回の10問に入ります</div></div>
-      <div class="qbox"><div class="k">待機中</div><div class="v" id="rvWait">0<small>問</small></div><div class="c">日を置いて再出題</div></div>
-      <div class="qbox"><div class="k">卒業</div><div class="v" id="rvGrad">0<small>問</small></div><div class="c">もう出しません</div></div>
-    </div>
-    <div class="rows" style="margin-top:18px" id="rvRows"></div>
-    <p class="muted" style="margin:12px 0 0">間違えた問題は翌日、正解できたら3日後、7日後と間隔が伸びます。途中で間違えると翌日に戻ります。</p>
+    <h2>今日戻ってくる問題</h2>
+    <div class="list" id="dueList"></div>
   </div>
-</section>
-
-<!-- ===== 一問一答（自作問題） ===== -->
-<section id="view-oq" class="hide">
   <div class="card">
-    <h2>一問一答 <span class="sub">自作問題・PDFを開かずに解けます</span></h2>
-    <div class="tiles" style="grid-template-columns:repeat(3,1fr)">
-      <div class="tile b"><div class="k">収録</div><div class="v" id="oqTotal">0<small>問</small></div></div>
-      <div class="tile"><div class="k">解いた</div><div class="v" id="oqSeen">0<small>問</small></div></div>
-      <div class="tile"><div class="k">正答率</div><div class="v" id="oqRate">–</div></div>
-    </div>
-    <p class="muted" style="margin:12px 0 0">
-      過去問の論点をもとに、事例も文章もこちらで書き起こした問題です。公式の試験問題ではありません。
-      いまは宅建業法（34論点）ぶんが入っています。
-    </p>
+    <h2>取りこぼし（間違い・勘で正解）</h2>
+    <div class="list" id="shakyList"></div>
   </div>
-
-  <div class="card" id="oqCard">
-    <p class="topic" id="oqTopic"></p>
-    <p style="font-size:16px;margin:6px 0 18px;line-height:1.85" id="oqQ"></p>
-    <div class="recall" style="grid-template-columns:repeat(2,1fr)" id="oqKeys">
-      <button data-v="1"><b>◯</b>正しい</button>
-      <button data-v="0"><b>✕</b>誤り</button>
-    </div>
-    <div class="result hide" id="oqResult">
-      <span class="verdict" id="oqVerdict"></span>
-      <span class="when" id="oqRef"></span>
-    </div>
-    <p class="muted hide" id="oqNote" style="margin:10px 0 0;font-size:13px;line-height:1.8"></p>
-    <button class="fill hide" id="oqNext" style="margin-top:14px">つぎの問題へ</button>
+  <div class="card">
+    <h2>お気に入り</h2>
+    <div class="list" id="favList"></div>
   </div>
 </section>
 
-<!-- ===== 論点一覧 ===== -->
+<!-- ========== 成績 ========== -->
+<section id="view-stats" class="hide">
+  <div class="card">
+    <h2>通算</h2>
+    <div class="plan" id="totals"></div>
+  </div>
+  <div class="card">
+    <h2>分野別の正答率</h2>
+    <div class="bars" id="byField"></div>
+    <p class="muted" style="margin:12px 0 0">括弧内は解いた問数。5問に満たない分野は参考値です。</p>
+  </div>
+  <div class="card">
+    <h2>苦手な論点</h2>
+    <div class="bars" id="byTopic"></div>
+    <p class="muted" style="margin:12px 0 0">正答率だけでなく、間違えた回数と「勘で正解」の多さも重みに入れています。</p>
+  </div>
+  <div class="card">
+    <h2>この7日間</h2>
+    <div class="bars" id="last7"></div>
+  </div>
+</section>
+
+<!-- ========== 論点一覧 ========== -->
 <section id="view-topics" class="hide">
   <div class="card">
-    <h2>論点一覧 <span class="sub">令和5〜7年度・150問</span></h2>
-    <p class="muted" style="margin:-6px 0 14px">
-      各問が何を問うているかの分類です。問題文は含みません。
-      解いた問題には正誤がつきます。行を押すと公式PDFの該当ページが開きます。
+    <h2>論点一覧</h2>
+    <p class="muted" style="margin:0 0 12px">
+      各問に付けた論点は、公式の問題文をもとに当方で分類したものです。機構の著作物ではありません。
     </p>
-    <div class="filters" id="topicFilters"></div>
-    <div class="rows" id="topicRows"></div>
+    <div class="list" id="topicList"></div>
   </div>
 </section>
 
-<!-- ===== 学習記録 ===== -->
-<section id="view-record" class="hide">
-  <div class="grid two">
-    <div class="card">
-      <h2>これまでの積み上げ</h2>
-      <div class="stats">
-        <div class="stat"><div class="k">4択で解いた数</div><div class="v" id="rTotal">0<small>問</small></div></div>
-        <div class="stat"><div class="k">4択の正答率</div><div class="v" id="rRate">–</div></div>
-        <div class="stat"><div class="k">手をつけた問題</div><div class="v" id="rSeen">0<small>/ 150</small></div></div>
-        <div class="stat"><div class="k">連続学習日数</div><div class="v" id="rStreak">0<small>日</small></div></div>
-        <div class="stat"><div class="k">論点で思い出せた率</div><div class="v" id="rRecall">–</div></div>
-        <div class="stat"><div class="k">論点で答えた数</div><div class="v" id="rRecallN">0<small>回</small></div></div>
-      </div>
-    </div>
-    <div class="card">
-      <h2>分野べつ <span class="sub">正答率</span></h2>
-      <div id="rFieldBars"></div>
-    </div>
-  </div>
-  <div class="card" style="margin-top:14px">
-    <h2>年度べつ</h2>
-    <div id="rYearBars"></div>
-  </div>
-  <div class="card" style="margin-top:14px">
-    <h2>日ごとの記録</h2>
-    <div class="rows" id="rLog"></div>
-  </div>
-</section>
-
-<!-- ===== 設定 ===== -->
+<!-- ========== 設定 ========== -->
 <section id="view-config" class="hide">
-  <div class="card settings">
+  <div class="card">
     <h2>設定</h2>
     <label>試験日<input type="date" id="examDate"></label>
-    <p class="muted" style="margin:0 0 8px">
+    <p class="muted" style="margin:0 0 16px">
       令和8年度（2026年度）の試験は <b>2026年10月18日（日）13時〜15時</b>。
       令和8年6月5日の官報公告で確定しています。合格発表は11月25日（水）。
     </p>
-    <p class="muted" style="margin:0 0 18px">記録はこの端末のブラウザにだけ保存されます。アカウントはありません。</p>
-    <button class="danger" id="resetBtn">記録を消す</button>
+    <h3 style="margin-top:0">記録の持ち出し</h3>
+    <p class="muted" style="margin:0 0 10px">
+      記録はこの端末のブラウザにだけ保存されます。iPhoneでは、Safariで開いたまま長く使わないと
+      消えることがあります。<b>「ホーム画面に追加」して使ってください。</b>
+      念のため、ときどきここから控えを取っておくと安全です。
+    </p>
+    <div class="btns two" style="margin-bottom:10px">
+      <button class="btn sub" id="expBtn">控えを表示</button>
+      <button class="btn sub" id="impBtn">控えから戻す</button>
+    </div>
+    <textarea id="ioBox" rows="4" class="hide" placeholder="ここに控えを貼り付けて「控えから戻す」"></textarea>
+    <h3>やりなおし</h3>
+    <button class="btn danger" id="resetBtn">記録を全部消す</button>
   </div>
 </section>
 
@@ -496,882 +302,711 @@
   <div class="notice">
     <strong>このサイトは非公式です。</strong>
     一般財団法人不動産適正取引推進機構とは関係がありません。
-    試験問題そのものは掲載しておらず、同機構が公開している
+    過去問の問題文そのものは掲載しておらず、同機構が公開している
     <a href="https://www.retio.or.jp/exam/past_ques_ans/other/" target="_blank" rel="noopener">公式ページ</a>のPDFへリンクしています。
-    収録は令和5〜7年度の150問。問題文・正解の内容についてのお問い合わせには、同機構・当サイトともにお答えできません。
+    一問一答（○×）の問題文・解説は当方が書き下ろしたものです。
+    問題・正解の内容についてのお問い合わせには、同機構・当サイトともにお答えできません。
+    法改正により、過去の問題が現在の法令と一致しない場合があります。
   </div>
 </footer>
-
 </div>
 
+<nav>
+  <div class="wrap">
+    <button data-go="home"><span class="ic">🏠</span>ホーム</button>
+    <button data-go="review"><span class="ic">🔁</span>復習</button>
+    <button data-go="stats"><span class="ic">📊</span>成績</button>
+    <button data-go="topics"><span class="ic">🏷</span>論点</button>
+    <button data-go="config"><span class="ic">⚙</span>設定</button>
+  </div>
+</nav>
+
+<script src="data.js"></script>
+<script src="questions.js" onerror="window.QTEXT=null"></script>
 <script>
 "use strict";
 
-/* ================= 出典 ================= */
+/* =========================================================
+   宅建ペースメーカー
+   - 過去問の問題文はこのアプリに入っていない（公式PDFを読む）
+   - questions.js が隣にあるときだけ、四択の本文を画面に出す（手元用）
+   ========================================================= */
+
 const OFFICIAL = "https://www.retio.or.jp/exam/past_ques_ans/other/";
 const PDF = {
+  R4:"https://www.retio.or.jp/wp-content/uploads/2024/10/R4-q_a.pdf",
   R5:"https://www.retio.or.jp/wp-content/uploads/2025/03/R5_qestion_answer%E3%80%80.pdf",
   R6:"https://www.retio.or.jp/wp-content/uploads/2025/03/R6_question_answer.pdf",
   R7:"https://www.retio.or.jp/wp-content/uploads/2025/12/R7_question_answer.pdf"
 };
-// PDFを該当ページで開くフラグメント。機構はリンクポリシーを公開していないので、
-// 気になるときは false にすればPDFの先頭を開く。ページ番号は画面に文字でも出している。
+const YEAR_LABEL = { R4:"令和4年度", R5:"令和5年度", R6:"令和6年度", R7:"令和7年度" };
 const USE_PAGE_ANCHOR = true;
 
-const YEAR_LABEL   = { R5:"令和5年度", R6:"令和6年度", R7:"令和7年度" };
-const YEAR_SEIREKI = { R5:2023, R6:2024, R7:2025 };
-const YEARS = ["R5","R6","R7"];
-
-/* 1問あたり「PDFページ2桁＋正解1桁」。問題文は持たない。 */
-const PACKED = {
-  R5:"031031042044054053063063072073084083092092104101113111121124132131141144154153164163172171184184191193204203213212222224232233244241254262262271272273",
-  R6:"031033041041051054063064073072083081092093094104103112113121122134133142142154151163174171181182194193204201212212224231232243244254252264262274272273",
-  R7:"023023033034044041051052061063073073083081094094102102112124124134131142141154161162172173184192193203211214224223234233241242254262264272273282281271"
-};
-
-/* 各問の論点。公式の問題文からこちらで分類したもので、機構の著作物ではない。 */
-const TOPICS = {
-  R5:[
-    "相続／遺産共有と遺産分割","相隣関係","請負／目的物の所有権と契約不適合","相殺",
-    "不在者の財産管理","取得時効／時効と登記","配偶者居住権","制限行為能力者（未成年者）",
-    "賃貸借／修繕と費用償還","抵当権／順位の譲渡・転抵当","借地権／存続期間","建物賃貸借（借家）",
-    "区分所有法","不動産登記法","都市計画法／都市計画の内容","都市計画法／開発許可",
-    "建築基準法／総合","建築基準法／建蔽率・道路・日影規制","宅地造成等規制法","土地区画整理法",
-    "農地法","国土利用計画法／事後届出","印紙税","不動産取得税","不動産の鑑定評価",
-    "37条書面／電磁的方法による提供","建物状況調査（インスペクション）","業務上の規制／禁止行為",
-    "免許","営業保証金","広告の規制","変更の届出・案内所等の届出","重要事項説明（35条書面）",
-    "報酬額の制限／貸借の媒介","クーリング・オフ","業務上の規制／禁止行為",
-    "従業者証明書・従業者名簿","宅建業の定義／免許の要否","手付金等の保全措置","媒介契約（専任媒介）",
-    "監督処分／宅地建物取引士","重要事項説明（35条書面）","37条書面","保証協会",
-    "住宅瑕疵担保履行法","住宅金融支援機構","景品表示法／公正競争規約","統計",
-    "土地（地形・地盤）","建物（構造と材料）"
-  ],
-  R6:[
-    "法律行為／意思能力・公序良俗","委任・準委任","共有／所在等不明共有者","相続／売主の地位の承継",
-    "履行遅滞","抵当権／地上権との優劣","賃貸借／敷金・対抗力","民法の条文知識","承諾／契約の成立",
-    "契約不適合責任／追完請求・代金減額","借地権","定期建物賃貸借と普通借家",
-    "区分所有法","不動産登記法","都市計画法／都市計画の内容","都市計画法／開発許可",
-    "建築基準法／総合","建築基準法／用途制限・高さ・建蔽率","盛土規制法","土地区画整理法",
-    "農地法","国土利用計画法／事後届出・事前届出","住宅ローン控除（所得税）","不動産取得税","不動産の鑑定評価",
-    "重要事項説明（35条書面）","営業保証金","報酬額の制限","宅地建物取引士","クーリング・オフ",
-    "監督処分・公告","媒介契約（専任媒介）","広告の規制","自ら売主制限（8種制限）",
-    "37条書面／電磁的方法による提供","営業保証金・保証協会","重要事項説明（35条書面）","免許",
-    "案内所等の届出（50条2項）","37条書面／貸借の記載事項","重要事項説明（35条書面）",
-    "人の死の告知に関するガイドライン","宅地建物取引士の登録・取引士証","37条書面",
-    "住宅瑕疵担保履行法","住宅金融支援機構","景品表示法／公正競争規約","統計",
-    "土地（地形・地盤）","建物（構造）"
-  ],
-  R7:[
-    "二重譲渡／対抗要件・背信的悪意者","保証・連帯保証／個人根保証","意思表示（心裡留保・虚偽表示・錯誤・詐欺）",
-    "消費貸借／期限の定めのない債務","相続／代襲相続","物権変動と対抗要件","賃貸借／修繕と第三者",
-    "共有","連帯債務／絶対効・相対効","契約不適合責任／損害賠償","借地権","建物賃貸借（普通借家）",
-    "区分所有法","不動産登記法","都市計画法／都市計画の内容","都市計画法／開発許可",
-    "建築基準法／総合","建築基準法／容積率・用途制限・建築協定","盛土規制法","土地区画整理法",
-    "農地法","国土利用計画法／事後届出","登録免許税","固定資産税","不動産の鑑定評価",
-    "報酬額の制限","重要事項説明（35条書面）","業務上の規制","37条書面","手付金等の保全措置",
-    "業務上の規制／勧誘の禁止行為","自ら売主制限（8種制限）","業務上の規制／37条書面",
-    "免許（欠格事由）","営業保証金","業務上の規制／勧誘の禁止行為","重要事項説明（35条書面）",
-    "業務上の規制／広告","媒介契約","クーリング・オフ","免許","宅地建物取引士",
-    "重要事項説明（35条書面）","犯罪収益移転防止法","住宅瑕疵担保履行法","住宅金融支援機構",
-    "景品表示法／公正競争規約","統計","土地（地形・地盤）","建物（構造と材料）"
-  ]
-};
-
-/* 自作の一問一答。過去問の論点を手がかりに、事例も文章もゼロから書いたもの。
-   公式の問題文とは無関係で、根拠として条文を添えてある。 */
-const ORIGINAL = [
-// ── 宅建業法 ──────────────────────────────────────
-{t:"宅建業の定義／免許の要否",q:"自ら所有する複数の建物を、不特定多数に反復継続して賃貸する行為には、宅建業の免許が必要である。",a:false,ref:"宅建業法2条2号",n:"自ら貸主となる賃貸は「取引」に当たらない。転貸も同じ。"},
-{t:"宅建業の定義／免許の要否",q:"自ら所有する土地を10区画に分割し、不特定多数に反復継続して売却する場合、免許が必要である。",a:true,ref:"宅建業法2条2号・3条1項",n:"自ら売買は「取引」に当たる。区画割りして反復継続すれば業に該当する。"},
-
-{t:"免許",q:"二以上の都道府県に事務所を置いて宅建業を営もうとする者は、国土交通大臣の免許を受ける。",a:true,ref:"宅建業法3条1項",n:"一の都道府県内だけなら、その都道府県知事の免許。"},
-{t:"免許",q:"宅地建物取引業の免許の有効期間は3年である。",a:false,ref:"宅建業法3条2項",n:"5年。取引士証の5年と混同しないよう、免許も5年と覚える。"},
-
-{t:"免許（欠格事由）",q:"法人の政令で定める使用人が、暴力団員による不当な行為の防止等に関する法律の規定に違反して罰金の刑に処せられ、5年を経過していない場合、その法人は免許を受けられない。",a:true,ref:"宅建業法5条1項6号・12号",n:"役員や政令使用人が欠格なら、法人も連座して欠格になる。"},
-{t:"免許（欠格事由）",q:"刑法の傷害罪により科料に処せられた者は、その執行を終えてから5年間は免許を受けられない。",a:false,ref:"宅建業法5条1項5号・6号",n:"欠格になるのは罰金以上。科料は罰金より軽く、欠格事由に当たらない。"},
-
-{t:"営業保証金",q:"営業保証金の額は、主たる事務所につき1,000万円、その他の事務所につき事務所ごとに500万円である。",a:true,ref:"宅建業法25条2項・施行令2条の4",n:"保証協会の弁済業務保証金分担金（60万円・30万円）と対で覚える。"},
-{t:"営業保証金",q:"営業保証金は金銭で供託しなければならず、有価証券をもって充てることはできない。",a:false,ref:"宅建業法25条3項",n:"国債は額面の100%、地方債・政府保証債は90%、その他は80%で評価される。"},
-
-{t:"営業保証金・保証協会",q:"保証協会の社員となった者は、営業保証金を供託する必要がない。",a:true,ref:"宅建業法64条の13",n:"分担金を納付することで供託が免除される。二重に積む必要はない。"},
-{t:"営業保証金・保証協会",q:"保証協会の社員は、新たに事務所を設置したときは、その日から2週間以内に分担金を納付しなければならない。",a:true,ref:"宅建業法64条の9第2項",n:"営業保証金の追加供託と違い、こちらは期限内に納付しないと社員の地位を失う。"},
-
-{t:"保証協会",q:"還付により弁済業務保証金が不足したとき、社員は通知を受けた日から2週間以内に還付充当金を納付しなければならない。",a:true,ref:"宅建業法64条の10第2項",n:"納付しないと社員の地位を失い、その日から1週間以内に営業保証金の供託が必要になる。"},
-{t:"保証協会",q:"宅建業者は、複数の保証協会に同時に加入することができる。",a:false,ref:"宅建業法64条の4第1項",n:"一の保証協会の社員である者は、他の保証協会の社員となることができない。"},
-
-{t:"宅地建物取引士",q:"宅地建物取引士証の有効期間は5年である。",a:true,ref:"宅建業法22条の2第3項",n:"登録には有効期間がなく、更新が必要なのは取引士証のほう。"},
-{t:"宅地建物取引士",q:"取引士証の交付を受けようとする者は、原則として、交付の申請前6か月以内に行われる法定講習を受講しなければならない。",a:true,ref:"宅建業法22条の2第2項",n:"ただし試験合格から1年以内に交付を受ける場合は不要。"},
-
-{t:"宅地建物取引士の登録・取引士証",q:"登録を受けている者が住所を変更したときは、遅滞なく変更の登録を申請しなければならない。",a:true,ref:"宅建業法20条・18条2項",n:"氏名・住所・本籍・勤務先の業者名と免許証番号が変更登録の対象。"},
-{t:"宅地建物取引士の登録・取引士証",q:"登録の移転は、登録を受けている都道府県以外の都道府県に住所を移したときに申請できる。",a:false,ref:"宅建業法19条の2",n:"基準は住所ではなく勤務先。他県の事務所に従事することとなったときに申請できる（任意）。"},
-
-{t:"監督処分／宅地建物取引士",q:"宅地建物取引士が不正の手段により登録を受けた場合、登録をした都道府県知事は、その登録を消除しなければならない。",a:true,ref:"宅建業法68条の2第1項1号",n:"「できる」ではなく必要的な消除。事務禁止処分の1年以内とは扱いが違う。"},
-{t:"監督処分／宅地建物取引士",q:"都道府県知事は、その登録を受けている取引士に対してのみ、指示処分をすることができる。",a:false,ref:"宅建業法68条1項・3項",n:"取引士が業務を行う地を管轄する知事も、指示処分・事務禁止処分ができる。"},
-
-{t:"監督処分・公告",q:"国土交通大臣又は都道府県知事は、業務停止処分をしたときは、その旨を公告しなければならない。",a:true,ref:"宅建業法70条1項",n:"公告が必要なのは業務停止と免許取消し。指示処分は公告されない。"},
-{t:"監督処分・公告",q:"免許権者は、免許を受けた業者の事務所の所在地を確知できないときは、公告し、その日から30日を経過しても申出がなければ免許を取り消すことができる。",a:true,ref:"宅建業法67条1項",n:"所在不明による取消しは、聴聞を経ずに行える例外。"},
-
-{t:"変更の届出・案内所等の届出",q:"宅建業者は、商号を変更したときは、30日以内に免許権者に変更の届出をしなければならない。",a:true,ref:"宅建業法9条・8条2項",n:"商号・役員・政令使用人・事務所・専任の取引士が対象。"},
-{t:"変更の届出・案内所等の届出",q:"事務所の専任の宅地建物取引士に変更があっても、届出は不要である。",a:false,ref:"宅建業法9条・8条2項6号",n:"専任の取引士の氏名は免許申請書の記載事項なので、変更届が必要。"},
-
-{t:"案内所等の届出（50条2項）",q:"契約の締結を行う案内所を設置する業者は、業務開始の10日前までに免許権者と所在地の知事に届け出なければならない。",a:true,ref:"宅建業法50条2項・規則19条3項",n:"届出先が2か所ある点が問われやすい。"},
-{t:"案内所等の届出（50条2項）",q:"契約行為を行わない単なる展示会の会場にも、専任の宅地建物取引士を1名以上置かなければならない。",a:false,ref:"宅建業法31条の3・規則15条の5の2",n:"専任の取引士が必要なのは契約行為等を行う案内所。標識はどちらにも必要。"},
-
-{t:"従業者証明書・従業者名簿",q:"宅建業者は、取引の関係者から請求があったときは、従業者名簿を閲覧させなければならない。",a:true,ref:"宅建業法48条4項",n:"名簿は最終記載日から10年間保存。帳簿は5年（自ら売主の新築住宅は10年）。"},
-{t:"従業者証明書・従業者名簿",q:"非常勤の役員やアルバイトには、従業者証明書を携帯させる必要はない。",a:false,ref:"宅建業法48条1項",n:"一時的な事務補助者も含め、業務に従事する者すべてに携帯させる。"},
-
-{t:"広告の規制",q:"宅建業者は、宅地の造成に関する開発許可を受ける前は、広告をすることができない。",a:true,ref:"宅建業法33条",n:"広告開始時期の制限。売買・交換・貸借のすべての広告が対象。"},
-{t:"広告の規制",q:"取引態様の別は、広告をするときに明示すれば足り、注文を受けたときに改めて告げる必要はない。",a:false,ref:"宅建業法34条1項・2項",n:"広告時と注文時の両方で必要。広告を見た者からの注文でも省略できない。"},
-
-{t:"業務上の規制／広告",q:"実際には存在するが取引する意思のない物件を広告することは、おとり広告として禁止される。",a:true,ref:"宅建業法32条",n:"存在しない物件の広告（虚偽広告）も同様に禁止。"},
-{t:"業務上の規制／広告",q:"未完成物件について、建築確認を受ける前でも、確認申請中である旨を明示すれば広告できる。",a:false,ref:"宅建業法33条",n:"申請中であることを明示しても広告はできない。確認を受けた後でなければならない。"},
-
-{t:"業務上の規制",q:"宅建業者は、その業務に関して知り得た秘密を、廃業した後であっても正当な理由なく他に漏らしてはならない。",a:true,ref:"宅建業法45条",n:"守秘義務は業を営まなくなった後も続く。"},
-{t:"業務上の規制",q:"宅建業者は、契約の締結について勧誘するに際し、相手方に利益を生ずることが確実であると誤解させる断定的判断を提供してはならない。",a:true,ref:"宅建業法47条1号ニ・47条の2第1項",n:"将来の環境や利便について誤解させる断定的判断も同様に禁止。"},
-
-{t:"業務上の規制／禁止行為",q:"宅建業者は、手付について貸付けを行うことにより契約の締結を誘引してはならない。",a:true,ref:"宅建業法47条3号",n:"実際に契約が成立しなくても、誘引した時点で違反となる。"},
-{t:"業務上の規制／禁止行為",q:"買受けの申込みの撤回の申出があった場合、業者は既に要した費用を差し引いて預り金を返還することができる。",a:false,ref:"宅建業法47条の2第3項・規則16条の11",n:"預り金の返還を拒むこと自体が禁止。費用を理由に減額することもできない。"},
-
-{t:"業務上の規制／勧誘の禁止行為",q:"勧誘に先立って、業者の商号又は名称、勧誘を行う者の氏名、勧誘をする目的である旨を告げなければならない。",a:true,ref:"宅建業法47条の2第3項・規則16条の11",n:"3点セット。いずれか一つでも欠ければ違反になる。"},
-{t:"業務上の規制／勧誘の禁止行為",q:"相手方が契約しない旨を明確に告げた後でも、日を改めて電話で勧誘することは差し支えない。",a:false,ref:"規則16条の11第1号ニ",n:"契約しない旨の意思表示があれば、その後の勧誘の継続は禁止。日を改めても同じ。"},
-
-{t:"媒介契約",q:"宅建業者は、媒介契約を締結したときは、遅滞なく媒介契約書を作成して依頼者に交付しなければならない。",a:true,ref:"宅建業法34条の2第1項",n:"売買・交換の媒介が対象。貸借の媒介には34条の2の適用がない。"},
-{t:"媒介契約",q:"媒介契約書に記載する価額について意見を述べるときは、その根拠を明らかにしなければならない。",a:true,ref:"宅建業法34条の2第2項",n:"根拠は口頭でもよいが、明示は必須。"},
-
-{t:"媒介契約（専任媒介）",q:"専任媒介契約の有効期間は3か月を超えることができず、これより長い期間を定めたときは3か月に短縮される。",a:true,ref:"宅建業法34条の2第3項",n:"更新は依頼者からの申出が必要で、自動更新の特約は無効。"},
-{t:"媒介契約（専任媒介）",q:"専任媒介契約では、依頼者への業務処理状況の報告は1週間に1回以上行わなければならない。",a:false,ref:"宅建業法34条の2第9項",n:"専任は2週間に1回以上、専属専任が1週間に1回以上。"},
-
-{t:"建物状況調査（インスペクション）",q:"既存建物の売買の媒介契約書には、建物状況調査を実施する者のあっせんに関する事項を記載しなければならない。",a:true,ref:"宅建業法34条の2第1項4号",n:"あっせんの「有無」を記載する。あっせんしない場合も無と書く。"},
-{t:"建物状況調査（インスペクション）",q:"重要事項説明では、建物状況調査を実施しているかどうかにかかわらず、その結果の概要を説明しなければならない。",a:false,ref:"宅建業法35条1項6号の2",n:"説明が必要なのは、1年（鉄筋コンクリート造等の共同住宅は2年）以内の調査を実施している場合。"},
-
-{t:"重要事項説明（35条書面）",q:"重要事項の説明は、契約が成立するまでの間に行わなければならない。",a:true,ref:"宅建業法35条1項",n:"37条書面が契約成立後「遅滞なく」なのと対になる。"},
-{t:"重要事項説明（35条書面）",q:"重要事項説明書に記名する宅地建物取引士は、専任の宅地建物取引士でなければならない。",a:false,ref:"宅建業法35条5項",n:"取引士であればよく、専任である必要はない。説明する者も同じ。"},
-
-{t:"37条書面",q:"37条書面は、契約の当事者双方に交付しなければならない。",a:true,ref:"宅建業法37条1項",n:"媒介の場合、売主・買主の双方に交付する。"},
-{t:"37条書面",q:"37条書面の交付は、宅地建物取引士が行わなければならない。",a:false,ref:"宅建業法37条3項",n:"取引士でなければならないのは記名だけ。交付は誰でもよく、説明義務もない。"},
-
-{t:"業務上の規制／37条書面",q:"既存建物の売買では、建物の構造耐力上主要な部分等の状況について当事者の双方が確認した事項を、37条書面に記載しなければならない。",a:true,ref:"宅建業法37条1項2号の2",n:"売買・交換のみの記載事項。貸借では不要。"},
-{t:"業務上の規制／37条書面",q:"代金以外の金銭の授受に関する定めがあるときは、その額を記載すれば足り、授受の時期までは記載しなくてよい。",a:false,ref:"宅建業法37条1項6号",n:"額・授受の時期・授受の目的の3つを記載する。"},
-{t:"37条書面／貸借の記載事項",q:"貸借の37条書面には、代金又は交換差金についての金銭の貸借のあっせんに関する定めを記載する必要はない。",a:true,ref:"宅建業法37条2項",n:"ローンのあっせんは売買・交換だけの記載事項。貸借では不要。"},
-{t:"37条書面／貸借の記載事項",q:"貸借の37条書面には、契約の解除に関する定めがあるときは、その内容を記載しなければならない。",a:true,ref:"宅建業法37条2項1号・37条1項7号",n:"解除・損害賠償額の予定・天災その他不可抗力による損害の負担は、貸借でも任意的記載事項。"},
-
-{t:"37条書面／電磁的方法による提供",q:"37条書面は、相手方の承諾を得れば、書面の交付に代えて電磁的方法により提供することができる。",a:true,ref:"宅建業法37条4項・5項",n:"35条書面も同様。承諾は書面又は電磁的方法で得る必要がある。"},
-{t:"37条書面／電磁的方法による提供",q:"電磁的方法で提供する場合、宅地建物取引士の記名に代わる措置は不要である。",a:false,ref:"施行規則16条の4の12",n:"取引士が明示される措置が必要。電子署名等で誰が記名したか分かるようにする。"},
-
-{t:"報酬額の制限",q:"売買の媒介において、代金が400万円を超える場合の報酬限度額は「代金×3%＋6万円」に消費税相当額を加えた額である。",a:true,ref:"宅建業法46条・報酬告示",n:"代理の場合はこの2倍。売主・買主双方から受ける合計にも上限がある。"},
-{t:"報酬額の制限",q:"依頼者の依頼によらずに行った広告の料金は、報酬とは別に受け取ることができる。",a:false,ref:"宅建業法46条・報酬告示第9",n:"別途受領できるのは、依頼者の依頼によって行う広告の料金に限られる。"},
-
-{t:"報酬額の制限／貸借の媒介",q:"居住用建物の貸借の媒介で依頼者の一方から受け取れる報酬は、媒介の依頼を受けるにあたって承諾を得ている場合を除き、借賃の0.5か月分に消費税相当額を加えた額が上限である。",a:true,ref:"報酬告示第4",n:"双方から受ける合計は借賃1か月分＋消費税が上限。"},
-{t:"報酬額の制限／貸借の媒介",q:"居住用建物以外の貸借で権利金の授受があるときは、権利金を代金とみなして計算した額と借賃基準の額の、いずれか高いほうを上限にできる。",a:true,ref:"報酬告示第6",n:"居住用建物にはこの特例が使えない点が問われる。"},
-
-{t:"自ら売主制限（8種制限）",q:"8種制限は、宅建業者が自ら売主となり、買主が宅建業者でない場合に適用される。",a:true,ref:"宅建業法78条2項",n:"買主も業者なら適用されない。媒介・代理のときも適用されない。"},
-{t:"自ら売主制限（8種制限）",q:"損害賠償額の予定と違約金を合算して代金の3割と定めた場合、その定めは全部無効となる。",a:false,ref:"宅建業法38条",n:"2割を超える部分だけが無効。定め全体が無効になるのではない。"},
-
-{t:"手付金等の保全措置",q:"未完成物件の売買では、手付金等の額が代金の5%以下かつ1,000万円以下であれば、保全措置を講じなくてよい。",a:true,ref:"宅建業法41条1項",n:"完成物件は10%以下かつ1,000万円以下。数字の入れ替えに注意。"},
-{t:"手付金等の保全措置",q:"買主への所有権移転登記が済んだ後に受領する金銭についても、保全措置が必要である。",a:false,ref:"宅建業法41条1項ただし書",n:"買主が登記を備えれば保全措置は不要になる。"},
-
-{t:"クーリング・オフ",q:"買受けの申込みを業者の事務所で行った場合、その後に喫茶店で契約を締結しても、クーリング・オフはできない。",a:true,ref:"宅建業法37条の2第1項",n:"判定の基準は申込みをした場所。事務所等で申し込めば適用外。"},
-{t:"クーリング・オフ",q:"クーリング・オフによる契約の解除は、その旨の書面が業者に到達した時に効力を生ずる。",a:false,ref:"宅建業法37条の2第2項",n:"書面を発した時に効力を生ずる（発信主義）。"},
-
-{t:"人の死の告知に関するガイドライン",q:"取引の対象となる不動産で発生した自然死や日常生活での不慮の死は、原則として告げなくてよい。",a:true,ref:"人の死の告知に関するガイドライン",n:"ただし特殊清掃等が行われた場合は告知の対象になる。"},
-{t:"人の死の告知に関するガイドライン",q:"賃貸借では、告知の対象となる死が発生してから概ね3年が経過すれば、原則として告げなくてよい。",a:true,ref:"人の死の告知に関するガイドライン",n:"売買には期間の目安が示されていない点に注意。"},
-
-{t:"住宅瑕疵担保履行法",q:"自ら売主として新築住宅を宅建業者でない買主に引き渡した業者は、住宅販売瑕疵担保保証金の供託又は保険契約の締結をしなければならない。",a:true,ref:"住宅瑕疵担保履行法11条",n:"買主も業者なら資力確保措置は不要。"},
-{t:"住宅瑕疵担保履行法",q:"資力確保措置の状況について基準日ごとの届出をしなかった場合でも、新たな売買契約の締結は制限されない。",a:false,ref:"住宅瑕疵担保履行法13条",n:"基準日の翌日から起算して50日を経過した日以後、新築住宅の売買契約を締結できなくなる。"},
-
-{t:"犯罪収益移転防止法",q:"宅建業者は、宅地建物の売買契約の締結に際して、顧客の取引時確認を行わなければならない。",a:true,ref:"犯罪収益移転防止法4条1項・2条2項",n:"確認記録は契約が終了した日から7年間保存する。"},
-{t:"犯罪収益移転防止法",q:"宅地建物の貸借の媒介も、取引時確認が必要な特定取引に当たる。",a:false,ref:"犯罪収益移転防止法・施行令",n:"対象は売買とその代理・媒介。貸借の媒介は特定取引に含まれない。"},
-
-// ── 法令上の制限 ──────────────────────────────────
-{t:"都市計画法／都市計画の内容",q:"市街化区域については、少なくとも用途地域を定めるものとされている。",a:true,ref:"都市計画法13条1項7号",n:"市街化調整区域は原則として用途地域を定めない、と対で覚える。"},
-{t:"都市計画法／都市計画の内容",q:"準都市計画区域には、高度利用地区を定めることができる。",a:false,ref:"都市計画法8条2項",n:"準都市計画区域に定められる高度地区は「最高限度」のみ。高度利用地区は定められない。"},
-
-{t:"都市計画法／開発許可",q:"市街化区域内で行う1,000㎡未満の開発行為は、原則として開発許可を受ける必要がない。",a:true,ref:"都市計画法29条1項1号・施行令19条",n:"市街化調整区域には規模による例外がなく、原則すべて許可が必要。"},
-{t:"都市計画法／開発許可",q:"市街化調整区域内で、農林漁業を営む者の居住用建築物を建てるための開発行為には、規模にかかわらず開発許可が必要である。",a:false,ref:"都市計画法29条1項2号",n:"農林漁業用の建築物と、これを営む者の居住用建築物は許可不要。"},
-
-{t:"建築基準法／総合",q:"建築確認を受けた工事が完了したときは、原則として完了した日から4日以内に到達するよう完了検査を申請しなければならない。",a:true,ref:"建築基準法7条2項",n:"中間検査は特定工程を終えてから4日以内。数字が共通している。"},
-{t:"建築基準法／総合",q:"用途地域の指定のない区域内の建築物には、容積率の制限は適用されない。",a:false,ref:"建築基準法52条1項7号",n:"特定行政庁が都道府県都市計画審議会の議を経て定める数値が適用される。"},
-
-{t:"建築基準法／建蔽率・道路・日影規制",q:"建蔽率の限度が80%の地域内で、かつ防火地域内にある耐火建築物については、建蔽率の制限が適用されない。",a:true,ref:"建築基準法53条6項1号",n:"80%以外の地域なら10%の緩和にとどまる点と区別する。"},
-{t:"建築基準法／建蔽率・道路・日影規制",q:"日影規制は、商業地域・工業地域・工業専用地域にも適用される。",a:false,ref:"建築基準法56条の2・別表第4",n:"この3地域は日影規制の対象区域として指定できない。"},
-
-{t:"建築基準法／容積率・用途制限・建築協定",q:"建築協定を締結するには、その区域内の土地の所有者等の全員の合意が必要である。",a:true,ref:"建築基準法70条3項",n:"締結は全員合意、廃止は過半数の合意。入口と出口で要件が違う。"},
-{t:"建築基準法／容積率・用途制限・建築協定",q:"前面道路の幅員が12m未満のとき、容積率は都市計画で定めた数値と道路幅員による数値のうち、大きいほうが限度となる。",a:false,ref:"建築基準法52条2項",n:"小さいほう（厳しいほう）が限度になる。"},
-
-{t:"建築基準法／用途制限・高さ・建蔽率",q:"第一種低層住居専用地域内の建築物の高さは、原則として都市計画で定められた10mまたは12mの限度を超えてはならない。",a:true,ref:"建築基準法55条1項",n:"田園住居地域も同じ絶対高さ制限を受ける。"},
-{t:"建築基準法／用途制限・高さ・建蔽率",q:"病院は、第一種低層住居専用地域内に建築することができる。",a:false,ref:"建築基準法48条・別表第2",n:"診療所は建てられるが病院は建てられない。大学も同様に不可。"},
-
-{t:"盛土規制法",q:"宅地造成等工事規制区域内で宅地造成に関する工事を行う工事主は、原則として都道府県知事の許可を受けなければならない。",a:true,ref:"盛土規制法12条1項",n:"工事主が申請者。工事施行者や造成主ではない。"},
-{t:"盛土規制法",q:"宅地造成等工事規制区域は、市街化区域内に限って指定することができる。",a:false,ref:"盛土規制法10条1項",n:"都市計画区域の内外を問わず、危険性のある区域を指定できる。"},
-
-{t:"宅地造成等規制法",q:"宅地造成等規制法は令和5年5月に改正・改称され、現在は「宅地造成及び特定盛土等規制法（盛土規制法）」となっている。",a:true,ref:"盛土規制法",n:"令和5年度の出題は旧法。いま学ぶときは新法で覚え直す必要がある。"},
-{t:"宅地造成等規制法",q:"盛土規制法の規制対象となる土地は宅地に限られ、農地や森林は含まれない。",a:false,ref:"盛土規制法2条1号",n:"旧法との最大の違い。農地・採草放牧地・森林も規制対象に取り込まれた。"},
-
-{t:"土地区画整理法",q:"換地処分の公告があった日の翌日から、換地は従前の宅地とみなされる。",a:true,ref:"土地区画整理法104条1項",n:"公告があった日「の翌日」。清算金の確定も同じ日。"},
-{t:"土地区画整理法",q:"仮換地が指定されても、従前の宅地の所有者は換地処分の公告の日まで従前の宅地を使用収益できる。",a:false,ref:"土地区画整理法99条1項",n:"効力発生日から従前の宅地は使用収益できなくなり、代わりに仮換地を使用収益する。"},
-
-{t:"農地法",q:"農地を農地以外のものにするために所有権を移転する場合は、5条の許可が必要である。",a:true,ref:"農地法5条1項",n:"3条は権利移動、4条は自己転用、5条は転用目的の権利移動。"},
-{t:"農地法",q:"相続により農地を取得した場合、3条の許可を受けなければならない。",a:false,ref:"農地法3条1項12号・3条の3",n:"許可は不要だが、遅滞なく農業委員会への届出が必要。"},
-
-{t:"国土利用計画法／事後届出",q:"市街化区域内で2,000㎡以上の土地の売買契約を締結したときは、権利取得者が契約締結日から起算して2週間以内に事後届出をする。",a:true,ref:"国土利用計画法23条",n:"市街化調整区域・非線引き区域は5,000㎡、都市計画区域外は10,000㎡。"},
-{t:"国土利用計画法／事後届出",q:"事後届出は、契約の当事者双方が共同して行わなければならない。",a:false,ref:"国土利用計画法23条1項",n:"権利取得者（買主側）が単独で行う。事前届出は当事者双方が行う点と対比する。"},
-
-{t:"国土利用計画法／事後届出・事前届出",q:"注視区域・監視区域内で一定面積以上の土地取引をしようとするときは、契約締結前に当事者双方が届け出なければならない。",a:true,ref:"国土利用計画法27条の4・27条の7",n:"規制区域はさらに厳しく、届出ではなく知事の許可が必要になる。"},
-{t:"国土利用計画法／事後届出・事前届出",q:"監視区域で都道府県の規則が定める届出対象面積は、事後届出の面積要件より大きく定められる。",a:false,ref:"国土利用計画法27条の7第1項",n:"規制を強める区域なので、より小さい面積から届出が必要になる。"},
-
-// ── 税・その他 ────────────────────────────────────
-{t:"不動産取得税",q:"不動産取得税は、市町村が課する税である。",a:false,ref:"地方税法73条の2",n:"道府県税。固定資産税が市町村税なのと対で覚える。"},
-{t:"不動産取得税",q:"相続により不動産を取得した場合、不動産取得税は課されない。",a:true,ref:"地方税法73条の7第1号",n:"相続・法人の合併・共有物の分割などは非課税。贈与は課税される。"},
-
-{t:"固定資産税",q:"固定資産税の納税義務者は、原則として賦課期日である1月1日現在の所有者である。",a:true,ref:"地方税法343条・359条",n:"年の途中で売却しても、その年の納税義務者は1月1日の所有者。"},
-{t:"固定資産税",q:"固定資産税の税率は1.4%と定められており、市町村がこれを超える税率を定めることはできない。",a:false,ref:"地方税法350条1項",n:"1.4%は標準税率。市町村は条例でこれを超える税率を定められる。"},
-
-{t:"印紙税",q:"建物の賃貸借契約書は、印紙税の課税文書に当たらない。",a:true,ref:"印紙税法別表第1",n:"土地の賃借権設定契約書は課税文書。建物の賃貸借だけ外れる。"},
-{t:"印紙税",q:"契約金額の記載のない不動産売買契約書には、印紙税は課されない。",a:false,ref:"印紙税法別表第1第1号",n:"記載金額がなくても200円が課される。"},
-
-{t:"登録免許税",q:"登録免許税の課税標準となる不動産の価額は、実際の売買代金である。",a:false,ref:"登録免許税法附則7条",n:"固定資産課税台帳に登録された価格を用いる。"},
-{t:"登録免許税",q:"住宅用家屋の所有権移転登記の税率の軽減措置は、個人が自己の居住用に取得した床面積50㎡以上の家屋などの要件を満たす場合に適用される。",a:true,ref:"租税特別措置法73条",n:"法人には適用されない。取得後1年以内の登記であることも要件。"},
-
-{t:"住宅ローン控除（所得税）",q:"住宅ローン控除の適用を受けるには、その家屋の床面積が原則として50㎡以上である必要がある。",a:true,ref:"租税特別措置法41条",n:"一定の要件を満たす場合は40㎡以上に緩和される。"},
-{t:"住宅ローン控除（所得税）",q:"住宅ローン控除は、合計所得金額が3,000万円を超える年でも適用を受けられる。",a:false,ref:"租税特別措置法41条",n:"令和4年改正で所得要件は2,000万円以下に引き下げられている。"},
-
-{t:"不動産の鑑定評価",q:"不動産の価格を求める鑑定評価の手法には、原価法、取引事例比較法、収益還元法がある。",a:true,ref:"不動産鑑定評価基準",n:"賃料を求める手法は積算法・賃貸事例比較法・収益分析法。"},
-{t:"不動産の鑑定評価",q:"原価法は、対象不動産が土地のみである場合には適用できない。",a:false,ref:"不動産鑑定評価基準",n:"造成地や埋立地のように再調達原価を把握できれば、土地のみでも適用できる。"},
-
-// ── 免除科目 ──────────────────────────────────────
-{t:"住宅金融支援機構",q:"機構は、原則として自ら直接融資を行うのではなく、金融機関の住宅ローン債権を買い取る証券化支援業務を主な業務としている。",a:true,ref:"機構法13条1項",n:"災害復興住宅や高齢者向け返済特例など、直接融資が残る分野もある。"},
-{t:"住宅金融支援機構",q:"証券化支援事業（買取型）で機構が買い取る貸付債権の償還期間は、20年以下でなければならない。",a:false,ref:"機構業務方法書",n:"いわゆるフラット35で、最長35年の長期固定金利を可能にする仕組み。"},
-
-{t:"景品表示法／公正競争規約",q:"徒歩による所要時間は、道路距離80mにつき1分として算出し、1分未満の端数は切り上げる。",a:true,ref:"不動産の表示に関する公正競争規約施行規則",n:"信号待ちや坂道は考慮しない。切り捨てではなく切り上げ。"},
-{t:"景品表示法／公正競争規約",q:"建築後2年を経過した未入居の住宅は、「新築」と表示することができる。",a:false,ref:"不動産の表示に関する公正競争規約18条",n:"新築は建築後1年未満かつ未入居のものに限られる。"},
-
-{t:"統計",q:"地価公示の標準地の価格は、毎年1月1日を価格判定の基準日として、3月に公表される。",a:true,ref:"地価公示法",n:"7月1日基準で9月公表の都道府県地価調査と混同しやすい。"},
-{t:"統計",q:"新設住宅着工戸数を示す建築着工統計は、総務省が公表している。",a:false,ref:"建築着工統計調査",n:"国土交通省。法人企業統計は財務省、と発表元をセットで覚える。"},
-
-{t:"土地（地形・地盤）",q:"谷底低地や旧河道は地盤が軟弱で、地震時に液状化のおそれがあり、宅地には注意を要する。",a:true,ref:"一般的な地形と宅地適性",n:"台地・段丘は一般に安定していて宅地に適する、と対で覚える。"},
-{t:"土地（地形・地盤）",q:"干拓地は海面より高く造成されるため、埋立地よりも宅地に適している。",a:false,ref:"一般的な地形と宅地適性",n:"逆。埋立地は海面より高く造成されるが、干拓地は海面より低く宅地に適さない。"},
-
-{t:"建物（構造と材料）",q:"鉄骨造は自重が軽く靱性に富むが、火熱に弱いため耐火被覆が必要である。",a:true,ref:"一般的な建築構造の知識",n:"鉄は不燃材だが高温で急激に強度が落ちるため、被覆して守る。"},
-{t:"建物（構造と材料）",q:"コンクリートは引張強度が大きく、圧縮に対しては弱い。",a:false,ref:"一般的な建築構造の知識",n:"圧縮に強く引張に弱い。引張を鉄筋が負担するのが鉄筋コンクリート造。"},
-
-{t:"建物（構造）",q:"壁式構造は、板状の壁と床を箱形に組んで建物とする構造で、原則として柱や梁を用いない。",a:true,ref:"一般的な建築構造の知識",n:"ラーメン構造が柱と梁で支えるのと対照的。"},
-{t:"建物（構造）",q:"トラス式構造は、部材を四角形に組み合わせた骨組で構成される。",a:false,ref:"一般的な建築構造の知識",n:"三角形に組む。三角形は変形しにくいため大スパンの屋根などに使われる。"},
-
-// ── 権利関係 ──────────────────────────────────────
-{t:"法律行為／意思能力・公序良俗",q:"法律行為の当事者が意思表示をした時に意思能力を有しなかったときは、その法律行為は無効である。",a:true,ref:"民法3条の2",n:"取消しではなく無効。営業を許された未成年者でも同じ。"},
-{t:"法律行為／意思能力・公序良俗",q:"公の秩序又は善良の風俗に反する法律行為も、当事者双方が納得して合意していれば有効である。",a:false,ref:"民法90条",n:"当事者の納得では治らない。公序良俗違反は無効。"},
-
-{t:"意思表示（心裡留保・虚偽表示・錯誤・詐欺）",q:"相手方と通じてした虚偽の意思表示は無効であるが、善意の第三者には無効を対抗できない。",a:true,ref:"民法94条",n:"第三者は善意であればよく、無過失までは要求されない。"},
-{t:"意思表示（心裡留保・虚偽表示・錯誤・詐欺）",q:"第三者による詐欺の場合、相手方がその事実を知らず、知ることもできなかったときでも取り消すことができる。",a:false,ref:"民法96条2項",n:"相手方が悪意または有過失のときに限って取り消せる。"},
-
-{t:"制限行為能力者（未成年者）",q:"未成年者が法定代理人の同意なくした法律行為でも、単に権利を得または義務を免れる行為は取り消せない。",a:true,ref:"民法5条1項・2項",n:"負担のない贈与を受ける行為などが典型。"},
-{t:"制限行為能力者（未成年者）",q:"未成年者が成年者であると信じさせるため詐術を用いたときでも、その行為を取り消すことができる。",a:false,ref:"民法21条",n:"詐術を用いた制限行為能力者は取消権を失う。"},
-
-{t:"承諾／契約の成立",q:"隔地者間の契約は、承諾の通知が相手方に到達した時に成立する。",a:true,ref:"民法97条1項",n:"かつての発信主義は令和2年施行の改正で削除された。"},
-{t:"承諾／契約の成立",q:"申込みに条件を付して承諾したときは、その申込みについて承諾があったものとみなされる。",a:false,ref:"民法528条",n:"申込みの拒絶とともに、新たな申込みをしたものとみなされる。"},
-
-{t:"民法の条文知識",q:"無効な行為に基づく債務の履行として給付を受けた者は、相手方を原状に復させる義務を負う。",a:true,ref:"民法121条の2第1項",n:"原状回復義務。改正で条文として明記された。"},
-{t:"民法の条文知識",q:"隔地者間の契約は承諾の通知を発した時に成立する、と民法に規定されている。",a:false,ref:"民法97条1項",n:"到達主義。発信主義の規定は削除済みで、条文として存在しない。"},
-
-{t:"物権変動と対抗要件",q:"不動産に関する物権の得喪及び変更は、登記をしなければ第三者に対抗することができない。",a:true,ref:"民法177条",n:"意思表示だけで物権は移転するが、対抗するには登記が要る。"},
-{t:"物権変動と対抗要件",q:"何らの権原もなく不動産を占有する者も、登記の欠缺を主張できる第三者に当たる。",a:false,ref:"民法177条・判例",n:"不法占拠者は177条の第三者に当たらない。登記なしで明渡しを請求できる。"},
-
-{t:"二重譲渡／対抗要件・背信的悪意者",q:"第一買主が登記を備えない間に、単に悪意であるにすぎない第二買主が登記を備えた場合、第二買主は所有権を対抗できる。",a:true,ref:"民法177条・判例",n:"単なる悪意は保護される。背信的悪意者になると話が変わる。"},
-{t:"二重譲渡／対抗要件・背信的悪意者",q:"背信的悪意者からの転得者は、転得者自身が背信的悪意者と評価されなくても、所有権を対抗できない。",a:false,ref:"判例",n:"転得者自身が背信的悪意者でない限り対抗できる。相対的に判断する。"},
-
-{t:"取得時効／時効と登記",q:"所有の意思をもって平穏かつ公然に10年間占有し、占有開始時に善意無過失であれば所有権を時効取得する。",a:true,ref:"民法162条2項",n:"悪意または有過失なら20年。善意無過失は開始時点だけ判定する。"},
-{t:"取得時効／時効と登記",q:"時効の完成後に元の所有者から所有権を取得した第三者に対し、時効取得者は登記なくして対抗できる。",a:false,ref:"判例",n:"時効完成前の第三者には登記なしで対抗できるが、完成後の第三者には登記が必要。"},
-
-{t:"相隣関係",q:"土地の所有者は、境界標の調査等に必要な範囲で隣地を使用できるが、住家に立ち入るには居住者の承諾が必要である。",a:true,ref:"民法209条1項",n:"令和5年施行の改正で、隣地使用の範囲が明文化された。"},
-{t:"相隣関係",q:"隣地の竹木の枝が境界線を越えるときは、土地の所有者は直ちに自らこれを切り取ることができる。",a:false,ref:"民法233条3項",n:"原則は所有者に切除させる。催告しても相当期間内に切除しないとき等に限り自ら切れる。"},
-
-{t:"共有",q:"共有物に変更（形状又は効用の著しい変更を伴わないものを除く）を加えるには、他の共有者全員の同意が必要である。",a:true,ref:"民法251条1項",n:"軽微な変更は管理行為として持分の過半数で決められる。"},
-{t:"共有",q:"共有物の管理に関する事項は、共有者全員の同意によって決する。",a:false,ref:"民法252条1項",n:"各共有者の持分の価格の過半数で決する。"},
-
-{t:"共有／所在等不明共有者",q:"他の共有者を知ることができないときは、裁判所の決定を得て、その共有者以外の持分の価格の過半数で管理に関する事項を決することができる。",a:true,ref:"民法252条2項1号",n:"令和5年施行の改正で新設。所在不明で共有物が動かせない状態を解消するための制度。"},
-{t:"共有／所在等不明共有者",q:"所在等不明共有者の持分を取得するには、他の共有者全員の同意があれば裁判所の決定は不要である。",a:false,ref:"民法262条の2",n:"裁判所への請求と決定が必要。同意だけでは取得できない。"},
-
-{t:"相続／遺産共有と遺産分割",q:"遺産分割の効力は相続開始の時にさかのぼって生ずるが、第三者の権利を害することはできない。",a:true,ref:"民法909条",n:"さかのぼるのが原則。第三者保護が例外として置かれている。"},
-{t:"相続／遺産共有と遺産分割",q:"遺産である不動産から遺産分割前に生じた賃料債権は、分割によりその不動産を取得した相続人が当然に取得する。",a:false,ref:"判例",n:"相続開始から分割までの賃料は、各共同相続人が相続分に応じて分割単独債権として取得する。"},
-
-{t:"相続／代襲相続",q:"被相続人の子が相続開始以前に死亡していたときは、その者の子が代襲して相続人となる。",a:true,ref:"民法887条2項",n:"子の代襲は再代襲もあるが、兄弟姉妹の代襲は1代限り。"},
-{t:"相続／代襲相続",q:"相続を放棄した者の子は、代襲相続人となる。",a:false,ref:"民法887条2項",n:"代襲原因は死亡・欠格・廃除の3つ。放棄は含まれない。"},
-
-{t:"相続／売主の地位の承継",q:"売買契約の締結後に売主が死亡した場合、相続人は売主としての義務を承継する。",a:true,ref:"民法896条",n:"相続人は一身専属権を除き、被相続人の権利義務を包括して承継する。"},
-{t:"相続／売主の地位の承継",q:"相続人が数人あるときは、相続財産は相続開始と同時に各相続人の単独所有となる。",a:false,ref:"民法898条1項",n:"遺産分割までは共有に属する。"},
-
-{t:"配偶者居住権",q:"配偶者居住権の存続期間は、遺産分割等で別段の定めをしない限り、配偶者の終身の間である。",a:true,ref:"民法1030条",n:"期間を定めることもできるが、定めなければ終身。"},
-{t:"配偶者居住権",q:"配偶者居住権は、居住建物の所有者の承諾がなくても第三者に譲渡することができる。",a:false,ref:"民法1032条2項",n:"譲渡できない。配偶者の居住を守るための一身専属的な権利。"},
-
-{t:"不在者の財産管理",q:"家庭裁判所が選任した不在者財産管理人が、保存行為の範囲を超える行為をするには、家庭裁判所の許可が必要である。",a:true,ref:"民法28条",n:"権限の定めのない代理人として、保存・利用・改良までは許可なしでできる。"},
-{t:"不在者の財産管理",q:"失踪宣告を受けた者の生存が判明した場合、失踪宣告は当然に効力を失う。",a:false,ref:"民法32条1項",n:"家庭裁判所による取消しが必要。取消しまでは死亡したものとして扱われる。"},
-
-{t:"履行遅滞",q:"期限を定めなかった債務は、債務者が履行の請求を受けた時から遅滞の責任を負う。",a:true,ref:"民法412条3項",n:"確定期限があれば期限到来時、不確定期限なら到来を知った時か請求時の早いほう。"},
-{t:"履行遅滞",q:"不法行為に基づく損害賠償債務は、被害者が請求した時から遅滞に陥る。",a:false,ref:"判例",n:"不法行為の時から当然に遅滞に陥る。催告は不要。"},
-
-{t:"相殺",q:"相殺は、当事者の一方から相手方に対する意思表示によってする。",a:true,ref:"民法506条1項",n:"効力は相殺適状の時にさかのぼって生ずる。"},
-{t:"相殺",q:"悪意による不法行為に基づく損害賠償債務を負う者は、その債務を受働債権として相殺することができる。",a:false,ref:"民法509条1号",n:"被害者に現実の給付を受けさせるための制限。加害者側からの相殺はできない。"},
-
-{t:"連帯債務／絶対効・相対効",q:"連帯債務者の一人がした弁済は、他の連帯債務者に対しても効力を生ずる。",a:true,ref:"民法438条以下",n:"絶対効は弁済・相殺・更改・混同。それ以外は原則として相対効。"},
-{t:"連帯債務／絶対効・相対効",q:"連帯債務者の一人に対してした債務の免除は、他の連帯債務者に対しても効力を生ずる。",a:false,ref:"民法441条",n:"令和2年施行の改正で、免除と時効の完成は相対効になった。"},
-
-{t:"保証・連帯保証／個人根保証",q:"保証契約は、書面又は電磁的記録でしなければ効力を生じない。",a:true,ref:"民法446条2項・3項",n:"口頭では無効。個人根保証契約では極度額の定めも必要になる。"},
-{t:"保証・連帯保証／個人根保証",q:"連帯保証人は、債権者から履行を請求されたとき、まず主たる債務者に請求するよう求めることができる。",a:false,ref:"民法454条",n:"連帯保証人には催告の抗弁権も検索の抗弁権もない。"},
-
-{t:"委任・準委任",q:"受任者は、委任者の許諾を得たとき、又はやむを得ない事由があるときでなければ、復受任者を選任できない。",a:true,ref:"民法644条の2第1項",n:"任意代理人の復代理と同じ枠組み。"},
-{t:"委任・準委任",q:"相手方に不利な時期に委任を解除した場合、やむを得ない事由があっても損害賠償責任を負う。",a:false,ref:"民法651条2項",n:"やむを得ない事由があるときは賠償義務を負わない。"},
-
-{t:"消費貸借／期限の定めのない債務",q:"書面によらない消費貸借は、当事者の合意だけでは成立せず、目的物の引渡しによって成立する。",a:true,ref:"民法587条",n:"書面でする消費貸借は合意だけで成立する諾成的消費貸借になる。"},
-{t:"消費貸借／期限の定めのない債務",q:"返還の時期を定めなかったときは、貸主はいつでも直ちに返還を請求することができる。",a:false,ref:"民法591条1項",n:"相当の期間を定めて催告する必要がある。"},
-
-{t:"抵当権／地上権との優劣",q:"抵当権の設定登記より先に登記された地上権は、抵当権の実行による買受人に対抗することができる。",a:true,ref:"民法177条・民事執行法59条",n:"登記の先後で決まる。後れる用益権は売却により消滅する。"},
-{t:"抵当権／地上権との優劣",q:"抵当権に後れる賃借権については、すべての賃借人が買受人に対し6か月の明渡猶予を主張できる。",a:false,ref:"民法395条1項",n:"建物の賃借人で、競売手続の開始前から使用収益している者に限られる。"},
-
-{t:"抵当権／順位の譲渡・転抵当",q:"抵当権者は、その抵当権を他の債権の担保とすること（転抵当）ができる。",a:true,ref:"民法376条1項",n:"抵当権の処分には、転抵当のほか順位の譲渡・放棄、抵当権の譲渡・放棄がある。"},
-{t:"抵当権／順位の譲渡・転抵当",q:"抵当権の順位の変更は、各抵当権者の合意だけで効力を生じ、登記は不要である。",a:false,ref:"民法374条2項",n:"登記をしなければ効力を生じない。合意だけでは足りない。"},
-
-{t:"契約不適合責任／追完請求・代金減額",q:"不適合が買主の責めに帰すべき事由によるものであるときは、買主は追完請求も代金減額請求もできない。",a:true,ref:"民法562条2項・563条3項",n:"買主に落ち度があるなら売主に責任を問えない。"},
-{t:"契約不適合責任／追完請求・代金減額",q:"代金減額請求は、催告をすることなく直ちにすることができる。",a:false,ref:"民法563条1項",n:"相当の期間を定めて追完を催告し、その期間内に追完がないときにできる。"},
-
-{t:"契約不適合責任／損害賠償",q:"種類・品質の不適合については、買主は不適合を知った時から1年以内にその旨を売主に通知しなければ、原則として責任を追及できない。",a:true,ref:"民法566条",n:"数量や権利の不適合には、この1年の通知期間の制限がない。"},
-{t:"契約不適合責任／損害賠償",q:"契約不適合による損害賠償請求には、売主の帰責事由は必要でない。",a:false,ref:"民法415条1項ただし書",n:"債務不履行責任なので、売主に帰責事由がなければ損害賠償は請求できない。"},
-
-{t:"請負／目的物の所有権と契約不適合",q:"請負人が仕事を完成しない間は、注文者はいつでも損害を賠償して契約を解除することができる。",a:true,ref:"民法641条",n:"注文者側の任意解除権。完成後は行使できない。"},
-{t:"請負／目的物の所有権と契約不適合",q:"請負の目的物が契約不適合であるとき、注文者は不適合を知った時から5年以内に通知すればよい。",a:false,ref:"民法637条1項",n:"1年以内。売買の566条と同じ期間。"},
-
-{t:"賃貸借／修繕と費用償還",q:"賃借人が必要費を支出したときは、賃貸人に対し、直ちにその償還を請求することができる。",a:true,ref:"民法608条1項",n:"有益費は賃貸借終了時まで待つ点と対比する。"},
-{t:"賃貸借／修繕と費用償還",q:"有益費は、支出の時に直ちにその償還を請求することができる。",a:false,ref:"民法608条2項",n:"賃貸借終了の時に、価格の増加が現存する場合に限り償還を請求できる。"},
-
-{t:"賃貸借／修繕と第三者",q:"修繕が必要である旨を通知したのに賃貸人が相当の期間内に修繕をしないときは、賃借人が自ら修繕することができる。",a:true,ref:"民法607条の2第1号",n:"急迫の事情があるときは通知なしでも自ら修繕できる。"},
-{t:"賃貸借／修繕と第三者",q:"賃借人の責めに帰すべき事由により修繕が必要となった場合でも、賃貸人は修繕義務を負う。",a:false,ref:"民法606条1項ただし書",n:"賃借人に原因があるときは賃貸人に修繕義務はない。"},
-
-{t:"賃貸借／敷金・対抗力",q:"賃貸人は、賃貸借が終了して賃貸物の返還を受けたときに、敷金から未払賃料等を控除した残額を返還する。",a:true,ref:"民法622条の2第1項1号",n:"返還時期は明渡し後。明渡しと敷金返還は同時履行の関係に立たない。"},
-{t:"賃貸借／敷金・対抗力",q:"賃借人は、賃貸借の継続中に、敷金を未払賃料の弁済に充てることを請求できる。",a:false,ref:"民法622条の2第2項",n:"充当できるのは賃貸人側だけ。賃借人からは請求できない。"},
-
-{t:"建物賃貸借（借家）",q:"建物の賃貸借は、その登記がなくても、建物の引渡しがあれば第三者に対抗することができる。",a:true,ref:"借地借家法31条",n:"借地権が建物の登記で対抗できるのと並べて覚える。"},
-{t:"建物賃貸借（借家）",q:"賃貸人が更新を拒絶するには、期間満了の1年前から6か月前までに通知すれば足り、正当事由は不要である。",a:false,ref:"借地借家法26条・28条",n:"通知に加えて正当事由が必要。通知だけでは更新を拒めない。"},
-
-{t:"建物賃貸借（普通借家）",q:"期間を1年未満と定めた建物賃貸借（定期建物賃貸借を除く）は、期間の定めがないものとみなされる。",a:true,ref:"借地借家法29条1項",n:"定期建物賃貸借なら1年未満の期間も有効に定められる。"},
-{t:"建物賃貸借（普通借家）",q:"建物賃貸借の存続期間は、20年を超えることができない。",a:false,ref:"借地借家法29条2項",n:"民法604条の上限は適用されず、20年を超える期間も定められる。"},
-
-{t:"定期建物賃貸借と普通借家",q:"定期建物賃貸借契約は、公正証書等の書面によって締結しなければならない。",a:true,ref:"借地借家法38条1項",n:"公正証書は例示で、書面であればよい。電磁的記録も可。"},
-{t:"定期建物賃貸借と普通借家",q:"定期建物賃貸借では、契約書に更新がない旨が書かれていれば、別途の書面による説明は不要である。",a:false,ref:"借地借家法38条3項・判例",n:"契約書とは別個の書面での説明が必要。怠ると更新がない旨の定めが無効になる。"},
-
-{t:"借地権",q:"借地権は、その登記がなくても、借地上の建物について登記があれば第三者に対抗することができる。",a:true,ref:"借地借家法10条1項",n:"建物の登記は借地権者名義であることが必要。"},
-{t:"借地権",q:"借地権の存続期間を30年より長く定めることはできない。",a:false,ref:"借地借家法3条",n:"30年は下限。これより長い期間を定めればその期間になる。"},
-
-{t:"借地権／存続期間",q:"最初の更新後の借地権の存続期間は20年、2回目以降の更新後は10年とされる。",a:true,ref:"借地借家法4条",n:"当初30年、更新後20年、その後10年。これより長い定めは有効。"},
-{t:"借地権／存続期間",q:"事業用定期借地権は、公正証書によらなくても、書面によれば設定することができる。",a:false,ref:"借地借家法23条3項",n:"事業用定期借地権だけは公正証書に限られる。"},
-
-{t:"区分所有法",q:"規約の設定・変更・廃止は、区分所有者及び議決権の各4分の3以上の多数による集会の決議で行う。",a:true,ref:"区分所有法31条1項",n:"建替えは各5分の4以上。数字を段階で覚える。"},
-{t:"区分所有法",q:"共用部分の変更（形状又は効用の著しい変更を伴わないものを除く）は、区分所有者及び議決権の各過半数で決することができる。",a:false,ref:"区分所有法17条1項",n:"各4分の3以上。ただし区分所有者の定数は規約で過半数まで減らせる。"},
-
-{t:"不動産登記法",q:"新築した建物の所有権を取得した者は、その取得の日から1か月以内に表題登記を申請しなければならない。",a:true,ref:"不動産登記法47条1項",n:"表示に関する登記には申請義務があるが、権利に関する登記には原則としてない。"},
-{t:"不動産登記法",q:"仮登記は、仮登記義務者の承諾があっても、仮登記権利者が単独で申請することはできない。",a:false,ref:"不動産登記法107条1項",n:"仮登記義務者の承諾があるとき、または仮登記を命ずる処分があるときは単独申請できる。"}
-];
-
-/* 宅建は出題順が固定なので、問番号から分野が決まる */
-const FIELDS = ["権利関係","法令上の制限","税・その他","宅建業法","免除科目"];
-function fieldOf(no){
-  if(no<=14) return FIELDS[0];
-  if(no<=22) return FIELDS[1];
-  if(no<=25) return FIELDS[2];
-  if(no<=45) return FIELDS[3];
-  return FIELDS[4];
-}
-
-const BANK=[];
-for(const y of YEARS){
-  const s=PACKED[y];
-  for(let i=0;i<50;i++){
-    const no=i+1;
-    BANK.push({ id:y+"-"+no, year:y, no,
-      page:parseInt(s.substr(i*3,2),10),
-      answer:parseInt(s.substr(i*3+2,1),10),
-      field:fieldOf(no), topic:TOPICS[y][i] });
-  }
-}
-const BY_ID=Object.fromEntries(BANK.map(q=>[q.id,q]));
-const DAILY=10;
+/* 本試験の出題数。推定得点の重みに使う。 */
+const WEIGHT = {"権利関係":14,"法令上の制限":8,"税・その他":3,"宅建業法":20,"免除科目":5};
+const PASS_LINE = 35;   // 直近の合格ラインは33〜36。安全側の35を目標に置く。
+
+const BANK = window.BANK || [];
+const ORIGINAL = window.ORIGINAL || [];
+const NOTES = window.NOTES || {};
+const QTEXT = window.QTEXT || null;      // 手元版だけ入る
+
+/* 出題対象。正解のない問（R4問48）は外す。 */
+const QUIZ_ITEMS = BANK.filter(q => q.a !== null);
+const OX_ITEMS = ORIGINAL.map((o,i) => ({ id:"O-"+i, kind:"ox", topic:o.t, q:o.q, a:o.a, ref:o.ref, n:o.n }));
+QUIZ_ITEMS.forEach(q => q.kind = "quiz");
+const ALL = {};
+QUIZ_ITEMS.forEach(q => ALL[q.id] = q);
+OX_ITEMS.forEach(q => ALL[q.id] = q);
+
+const DAILY = 10;
+const INTERVALS = [1,3,7,30];
 
 /* ================= 保存 ================= */
-const KEY="takken-pacemaker.v2";
-const DEFAULT_EXAM="2026-10-18"; // 令和8年度試験日。令和8年6月5日の官報公告で確定
+const KEY = "takken-pacemaker.v3";
+const OLD_KEY = "takken-pacemaker.v2";
+const DEFAULT_EXAM = "2026-10-18";
+
+function blank(){ return { v:3, items:{}, log:{}, session:null, examDate:DEFAULT_EXAM }; }
 
 function load(){
   try{
-    const s=JSON.parse(localStorage.getItem(KEY));
-    if(s&&s.items) return s;
+    const s = JSON.parse(localStorage.getItem(KEY));
+    if(s && s.items) return s;
   }catch(e){ /* 壊れていたら作り直す */ }
-  return { items:{}, session:null, log:{}, examDate:DEFAULT_EXAM };
+  // v2 からの引き継ぎ。段と期日だけ拾う。
+  try{
+    const old = JSON.parse(localStorage.getItem(OLD_KEY));
+    if(old && old.items){
+      const s = blank();
+      s.examDate = old.examDate || DEFAULT_EXAM;
+      for(const [id,it] of Object.entries(old.items)){
+        if(!ALL[id]) continue;
+        s.items[id] = { stage:it.stage||0, due:it.due||null, streak:0, wrong:0,
+                        seen:1, lastAt:it.lastAt||null, fav:!!it.fav, conf:null, reasons:{}, ms:[] };
+      }
+      return s;
+    }
+  }catch(e){ /* 無ければ新規 */ }
+  return blank();
 }
-let state=load();
-const save=()=>localStorage.setItem(KEY,JSON.stringify(state));
+let state = load();
+const save = () => { try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e){} };
+
+function item(id){
+  if(!state.items[id]) state.items[id] = { stage:0, due:null, streak:0, wrong:0,
+                                           seen:0, lastAt:null, fav:false, conf:null, reasons:{}, ms:[] };
+  return state.items[id];
+}
 
 /* ================= 日付 ================= */
-const pad=n=>String(n).padStart(2,"0");
+const pad = n => String(n).padStart(2,"0");
 function today(){ const d=new Date(); return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate()); }
 function addDays(iso,n){
-  const [y,m,d]=iso.split("-").map(Number);
-  const t=new Date(y,m-1,d+n);
+  const [y,m,d] = iso.split("-").map(Number);
+  const t = new Date(y, m-1, d+n);
   return t.getFullYear()+"-"+pad(t.getMonth()+1)+"-"+pad(t.getDate());
 }
 function daysBetween(a,b){
-  const p=s=>{const[y,m,d]=s.split("-").map(Number);return new Date(y,m-1,d);};
-  return Math.round((p(b)-p(a))/86400000);
+  const p = s => { const [y,m,d]=s.split("-").map(Number); return new Date(y,m-1,d).getTime(); };
+  return Math.round((p(b)-p(a)) / 86400000);
 }
-const jp=iso=>iso ? iso.slice(5).replace("-","/") : "";
 
 /* ================= 復習の間隔 ================= */
-// 復習に入るのは間違えた問題だけ。翌日 → 3日後 → 7日後 と正解を重ねたら卒業。
-// 途中で間違えたら翌日に戻す。一度も間違えていない問題はその場で卒業。
-const INTERVALS=[1,3,7];
-function schedule(item,grade,firstTime){
-  if(grade==="ng"){ item.stage=0; item.due=addDays(today(),1); return; }
-  if(grade==="mid"){
-    // あやふや。段は上げず、同じ間隔をもう一度置く。
-    const st=Math.min(item.stage||0,INTERVALS.length-1);
-    item.due=addDays(today(),INTERVALS[st]);
+/* 勘で正解した問題は「正解」として段を上げない。ここがこのアプリの肝。 */
+function schedule(it, correct, conf){
+  if(!correct){ it.stage = 0; it.streak = 0; it.wrong++; it.due = addDays(today(),1); return; }
+  it.streak++;
+  if(conf === "guess"){                       // 当たったが理解していない
+    it.due = addDays(today(), 2);              // 不正解の翌日より少しだけ後
+    return;                                    // 段は据え置き＝進んだことにしない
+  }
+  if(conf === "two"){                          // 二択まで絞った。半歩だけ進める
+    it.stage = Math.min(it.stage + 1, INTERVALS.length - 1);
+    it.due = addDays(today(), INTERVALS[it.stage]);
     return;
   }
-  if(firstTime){ item.stage=INTERVALS.length; item.due=null; return; }
-  item.stage=(item.stage||0)+1;
-  item.due = item.stage>=INTERVALS.length ? null : addDays(today(),INTERVALS[item.stage]);
-}
-
-/* ================= 今日の10問 ================= */
-function seededShuffle(arr,seed){
-  // 日付をたねにした並べ替え。同じ日に開き直しても順番が変わらない。
-  let h=0; for(const c of seed) h=(h*31+c.charCodeAt(0))|0;
-  const a=arr.slice();
-  for(let i=a.length-1;i>0;i--){
-    h=(h*1103515245+12345)&0x7fffffff;
-    const j=h%(i+1); [a[i],a[j]]=[a[j],a[i]];
-  }
-  return a;
-}
-function buildSession(){
-  const t=today(), picked=[];
-  const due=BANK.filter(q=>{const it=state.items[q.id];return it&&it.due&&it.due<=t;})
-                .sort((x,y)=>state.items[x.id].due.localeCompare(state.items[y.id].due));
-  for(const q of due) if(picked.length<DAILY) picked.push(q.id);
-
-  if(picked.length<DAILY){
-    for(const q of seededShuffle(BANK.filter(q=>!state.items[q.id]),t))
-      if(picked.length<DAILY) picked.push(q.id);
-  }
-  if(picked.length<DAILY){
-    // 150問すべてに触れたあと。復習待ちを前倒しし、足りなければ卒業組を久しぶり順に混ぜる。
-    const rest=BANK.filter(q=>state.items[q.id]&&!picked.includes(q.id)).sort((x,y)=>{
-      const a=state.items[x.id], b=state.items[y.id];
-      if(a.due&&b.due) return a.due.localeCompare(b.due);
-      if(a.due) return -1;
-      if(b.due) return 1;
-      return (a.last||"").localeCompare(b.last||"");
-    });
-    for(const q of rest) if(picked.length<DAILY) picked.push(q.id);
-  }
-  return { date:t, ids:picked, i:0, results:[] };
-}
-function session(){
-  if(!state.session||state.session.date!==today()) state.session=buildSession();
-  return state.session;
+  it.stage = it.stage + 1;                     // 確信して正解
+  it.due = it.stage >= INTERVALS.length ? null : addDays(today(), INTERVALS[it.stage]);
 }
 
 /* ================= 集計 ================= */
-function totals(){
-  const it=Object.values(state.items);
-  return { n:it.reduce((a,x)=>a+x.n,0), ok:it.reduce((a,x)=>a+x.ok,0), seen:it.length };
+function statOf(id){
+  const it = state.items[id];
+  if(!it || !it.seen) return null;
+  return it;
 }
-function rateBy(pick){
-  let n=0,ok=0;
-  for(const [id,it] of Object.entries(state.items)) if(pick(BY_ID[id])){ n+=it.n; ok+=it.ok; }
-  return { n, ok, pct: n?Math.round(ok/n*100):null };
+function isShaky(id){                          // 取りこぼし判定
+  const it = state.items[id];
+  if(!it || !it.seen) return false;
+  return it.wrong > 0 || it.conf === "guess" || it.streak === 0;
 }
-function streak(){
-  let c=0, d=today();
-  if(!state.log[d]) d=addDays(d,-1);        // 今日まだなら昨日から数える
-  while(state.log[d]){ c++; d=addDays(d,-1); }
-  return c;
-}
-function weekDone(){
-  let c=0;
-  for(let i=0;i<7;i++){ const l=state.log[addDays(today(),-i)]; if(l&&l.n>=DAILY) c++; }
-  return c;
-}
-function queueCounts(){
-  const t=today();
-  let today_=0,d1=0,d3=0,d7=0,wait=0,grad=0;
-  for(const it of Object.values(state.items)){
-    if(!it.due){ grad++; continue; }
-    if(it.due<=t){ today_++; continue; }
-    wait++;
-    const k=daysBetween(t,it.due);
-    if(k===1) d1++;
-    else if(k<=3) d3++;
-    else if(k<=7) d7++;
+function accuracy(list){
+  let n=0, ok=0;
+  for(const q of list){
+    const it = state.items[q.id];
+    if(!it || !it.seen) continue;
+    n++; if(it.streak > 0 && it.conf !== "guess") ok++;
   }
-  return {today:today_,d1,d3,d7,wait,grad};
-}
-function weakest(){
-  let worst=null;
-  for(const f of FIELDS){
-    const r=rateBy(q=>q.field===f);
-    if(r.n>=5 && (worst===null||r.pct<worst.pct)) worst={f,pct:r.pct};
-  }
-  return worst;
+  return { n, ok, rate: n ? ok/n : null };
 }
 
-/* ================= 画面 ================= */
-const $=id=>document.getElementById(id);
-const VIEWS=["home","study","review","oq","topics","record","config"];
+function fieldStats(){
+  const out = {};
+  for(const f of Object.keys(WEIGHT)){
+    out[f] = accuracy(QUIZ_ITEMS.filter(q => q.field === f));
+  }
+  return out;
+}
+
+/* 推定得点。分野別の正答率を本試験の出題数で加重する。
+   解いた数が少ない分野は全体の正答率で埋め、レンジを広めに出す。 */
+function estimate(){
+  const fs = fieldStats();
+  const all = accuracy(QUIZ_ITEMS);
+  if(!all.n) return null;
+  let pts = 0, thin = 0;
+  for(const [f,w] of Object.entries(WEIGHT)){
+    const s = fs[f];
+    const p = (s.n >= 5) ? s.rate : (all.rate ?? 0);
+    if(s.n < 5) thin += w;
+    pts += p * w;
+  }
+  // ざっくりした振れ幅。標本が少ないほど広がる。
+  const width = Math.max(2, Math.round(3 + thin/8 + (all.n < 40 ? 3 : 0)));
+  return { point: Math.round(pts), lo: Math.max(0, Math.round(pts)-width),
+           hi: Math.min(50, Math.round(pts)+width), n: all.n, thin };
+}
+
+/* 弱点スコア。正答率の低さ＋間違い回数＋勘正解の多さ。 */
+function weakTopics(minN){
+  const map = {};
+  for(const q of QUIZ_ITEMS.concat(OX_ITEMS)){
+    if(!q.topic) continue;
+    const it = state.items[q.id];
+    if(!it || !it.seen) continue;
+    const m = map[q.topic] || (map[q.topic] = { n:0, ok:0, wrong:0, guess:0 });
+    m.n++;
+    if(it.streak > 0 && it.conf !== "guess") m.ok++;
+    m.wrong += it.wrong;
+    if(it.conf === "guess") m.guess++;
+  }
+  return Object.entries(map)
+    .filter(([,m]) => m.n >= (minN||1))
+    .map(([t,m]) => ({ topic:t, n:m.n, rate:m.ok/m.n,
+                       score:(1-m.ok/m.n)*3 + m.wrong*0.5 + m.guess*1.2 }))
+    .filter(o => o.score > 0)
+    .sort((a,b) => b.score - a.score);
+}
+
+/* ================= 今日の10問 ================= */
+/* 弱点3・間違い3・勘で正解2・未回答2 を目安に、期日が来た問題を最優先で埋める。 */
+function buildSet(kind){
+  const pool = kind === "ox" ? OX_ITEMS : QUIZ_ITEMS;
+  const t = today();
+  const picked = [], used = new Set();
+  const take = (list, n) => {
+    for(const q of list){
+      if(picked.length >= DAILY || n <= 0) break;
+      if(used.has(q.id)) continue;
+      used.add(q.id); picked.push(q); n--;
+    }
+  };
+  const seen = q => { const it = state.items[q.id]; return it && it.seen; };
+  const due  = pool.filter(q => { const it = state.items[q.id]; return it && it.due && it.due <= t; })
+                   .sort((a,b) => (state.items[a.id].due < state.items[b.id].due ? -1 : 1));
+  take(due, DAILY);
+
+  const weakList = weakTopics(1).slice(0,8).map(o => o.topic);
+  const weak = pool.filter(q => q.topic && weakList.includes(q.topic) && !seen(q));
+  take(shuffle(weak), 3);
+
+  const wrong = pool.filter(q => { const it = state.items[q.id]; return it && it.wrong > 0; });
+  take(shuffle(wrong), 3);
+
+  const guess = pool.filter(q => { const it = state.items[q.id]; return it && it.conf === "guess"; });
+  take(shuffle(guess), 2);
+
+  const fresh = pool.filter(q => !seen(q));
+  take(shuffle(fresh), DAILY);
+
+  take(shuffle(pool.slice()), DAILY);           // それでも足りなければ何でも
+  return picked.slice(0, DAILY);
+}
+function shuffle(a){
+  a = a.slice();
+  for(let i=a.length-1;i>0;i--){ const j = Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; }
+  return a;
+}
+function planBreakdown(kind){
+  const pool = kind === "ox" ? OX_ITEMS : QUIZ_ITEMS;
+  const t = today();
+  const c = k => pool.filter(k).length;
+  return {
+    due:   c(q => { const it=state.items[q.id]; return it && it.due && it.due <= t; }),
+    wrong: c(q => { const it=state.items[q.id]; return it && it.wrong > 0; }),
+    guess: c(q => { const it=state.items[q.id]; return it && it.conf === "guess"; }),
+    fresh: c(q => !state.items[q.id] || !state.items[q.id].seen)
+  };
+}
+
+/* ================= 画面切り替え ================= */
+const VIEWS = ["home","study","review","stats","topics","config"];
 function go(v){
-  for(const x of VIEWS) $("view-"+x).classList.toggle("hide",x!==v);
-  for(const b of $("nav").children){
-    if(b.dataset.view===v) b.setAttribute("aria-current","page");
-    else b.removeAttribute("aria-current");
-  }
-  if(v==="home") renderHome();
-  if(v==="study") renderStudy();
-  if(v==="review") renderReview();
-  if(v==="oq") renderOQ();
-  if(v==="topics") renderTopics();
-  if(v==="record") renderRecord();
+  VIEWS.forEach(n => document.getElementById("view-"+n).classList.toggle("hide", n !== v));
+  document.querySelectorAll("nav button").forEach(b => b.classList.toggle("on", b.dataset.go === v));
   window.scrollTo(0,0);
+  if(v === "home") renderHome();
+  if(v === "review") renderReview();
+  if(v === "stats") renderStats();
+  if(v === "topics") renderTopics();
+  if(v === "config") document.getElementById("examDate").value = state.examDate;
 }
+document.querySelectorAll("nav button").forEach(b => b.onclick = () => go(b.dataset.go));
 
-function barsHtml(pairs,minN){
-  return pairs.map(([name,r])=>{
-    // 母数が少ないうちは数字を出さない（たまたまの1問で「苦手」と決めない）
-    if(minN && r.n<minN) r={n:r.n,ok:r.ok,pct:null};
-    const pct=r.pct===null?0:r.pct;
-    const low=r.pct!==null&&r.pct<60?" low":"";
-    return '<div class="bar"><span class="name">'+name+'</span>'
-      +'<span class="t"><i class="'+low.trim()+'" style="width:'+pct+'%"></i></span>'
-      +'<span class="val">'+(r.pct===null?"–":pct+"%")+'</span></div>';
-  }).join("");
+/* ================= ホーム ================= */
+function renderCountdown(){
+  const d = daysBetween(today(), state.examDate);
+  const el = document.getElementById("countdown");
+  el.innerHTML = d > 0 ? `試験まで <b>${d}</b> 日`
+              : d === 0 ? `<b>今日が試験日です</b>`
+              : `試験日から ${-d} 日`;
 }
 
 function renderHome(){
-  const left=daysBetween(today(),state.examDate);
-  $("cdNum").innerHTML=(left>=0?left:"–")+'<em>日</em>';
-  $("cdDate").textContent=state.examDate.replace(/-/g,"/");
+  renderCountdown();
 
-  const s=session(), t=totals(), q=queueCounts();
-  const doneToday=s.results.length;
-
-  $("heroLead").textContent = doneToday>=s.ids.length ? "今日のぶんは終わりました。" : "今日の10問から。";
-  const rounds = left>0 ? Math.floor(left*DAILY/BANK.length) : 0;
-  $("heroSub").textContent = left>0
-    ? "1日"+DAILY+"問なら、試験日までに150問を"+rounds+"周できます。"
-    : "試験日を設定してください。";
-
-  const pct=Math.round(t.seen/BANK.length*100);
-  $("planPct").textContent=pct;
-  $("planBar").style.width=pct+"%";
-  $("planNote").textContent="全150問中 "+t.seen+"問に手をつけました";
-
-  $("startBtn").textContent = doneToday>=s.ids.length ? "今日の結果を見る"
-    : doneToday>0 ? "つづきから（あと"+(s.ids.length-doneToday)+"問）" : "今日の10問をはじめる";
-
-  $("tToday").innerHTML=s.ids.length+'<small>問</small>';
-  $("tReview").innerHTML=s.ids.filter(id=>state.items[id]).length+'<small>問</small>';
-  const w=weakest();
-  $("tWeak").textContent=w?w.f:"—";
-  $("tProg").innerHTML=doneToday+'<small>/ '+s.ids.length+'</small>';
-
-  // 次に解く問題を、ホームからも直接開けるようにしておく
-  const nextId=s.ids[Math.min(doneToday,s.ids.length-1)];
-  if(nextId){
-    const nq=BY_ID[nextId];
-    $("pdfLink").href=PDF[nq.year]+(USE_PAGE_ANCHOR?"#page="+nq.page:"");
-    $("pdfLabel").textContent=YEAR_LABEL[nq.year]+" 問"+nq.no+" を開く";
+  const e = estimate();
+  const num = document.getElementById("estScore");
+  const rng = document.getElementById("estRange");
+  const gap = document.getElementById("estGap");
+  const basis = document.getElementById("estBasis");
+  if(!e){
+    num.textContent = "—";
+    rng.textContent = "";
+    gap.textContent = "まだ推定できません。四択を何問か解くと出ます。";
+    basis.textContent = "";
+  }else{
+    num.textContent = e.point;
+    rng.textContent = `点（${e.lo}〜${e.hi}点）`;
+    const need = PASS_LINE - e.point;
+    gap.innerHTML = need > 0
+      ? `合格ラインの目安 <b>${PASS_LINE}点</b> まで <b>あと${need}点</b>。`
+      : `合格ラインの目安 <b>${PASS_LINE}点</b> を <b>${-need}点</b> 上回っています。`;
+    basis.textContent = `四択を${e.n}問解いた時点の推定です。`
+      + (e.thin ? "解いた数が少ない分野があるため、幅を広めに出しています。" : "");
   }
 
-  $("q1").innerHTML=q.d1+'<small>問</small>';
-  $("q3").innerHTML=q.d3+'<small>問</small>';
-  $("q7").innerHTML=q.d7+'<small>問</small>';
-  $("queueNote").textContent = q.today
-    ? "きょう出る復習が"+q.today+"問あります。次の10問の先頭に入ります。"
-    : "きょう出る復習はありません。";
+  const p = planBreakdown("quiz"), o = planBreakdown("ox");
+  document.getElementById("planBreak").innerHTML = [
+    ["今日戻ってくる問題", p.due + o.due],
+    ["間違えたまま", p.wrong + o.wrong],
+    ["勘で当たったまま", p.guess + o.guess],
+    ["まだ解いていない", p.fresh + o.fresh]
+  ].map(([k,v]) => `<div><span>${k}</span><span>${v}問</span></div>`).join("");
 
-  $("fieldBars").innerHTML=barsHtml(FIELDS.map(f=>[f,rateBy(q=>q.field===f)]),5);
+  document.getElementById("planNote").textContent = QTEXT
+    ? "四択はこの端末に問題文が入っています。"
+    : "四択は公式PDFを開いて読み、番号だけ入力します。移動中は一問一答のほうが向いています。";
 
-  $("sTotal").innerHTML=t.n+'<small>問</small>';
-  $("sRate").textContent=t.n?Math.round(t.ok/t.n*100)+"%":"–";
-  $("sStreak").innerHTML=streak()+'<small>日</small>';
-  $("sWeek").innerHTML=weekDone()+'<small>/ 7</small>';
+  const w = weakTopics(1).slice(0,3);
+  document.getElementById("weak3").innerHTML = w.length
+    ? w.map(o => barHTML(o.topic, o.rate, o.n)).join("")
+    : `<p class="muted" style="margin:0">まだ判定できません。10問ほど解くと出ます。</p>`;
 
-  $("bannerSub").textContent="150問を1周するのに15日。試験日までは"+(left>0?left:0)+"日あります。";
-  const steps=[["10問",doneToday>0],["答え合わせ",doneToday>0],["復習",q.wait>0||q.today>0],["卒業",q.grad>0],["合格",false]];
-  $("steps").innerHTML=steps.map(([k,on])=>'<div class="step'+(on?" on":"")+'"><i></i>'+k+'</div>').join("");
+  renderBadges();
 }
 
-let picked=null, checked=false, forceQuiz=false;
-function renderStudy(){
-  const s=session();
-  const finished = s.results.length>=s.ids.length;
-  $("qCard").classList.toggle("hide",finished);
-  $("doneCard").classList.toggle("hide",!finished);
-
-  $("stPos").innerHTML=Math.min(s.results.length+1,s.ids.length)+'<small>/ '+s.ids.length+'</small>';
-  $("stOk").innerHTML=s.results.filter(Boolean).length+'<small>問</small>';
-
-  if(finished){
-    const ok=s.results.filter(Boolean).length;
-    $("dnScore").textContent=ok+" / "+s.results.length;
-    $("dnRate").textContent=s.results.length?Math.round(ok/s.results.length*100)+"%":"–";
-    $("dnQueue").innerHTML=s.results.filter(x=>!x).length+'<small>問</small>';
-    $("dnStreak").innerHTML=streak()+'<small>日</small>';
-    const back=s.results.filter(x=>!x).length;
-    $("dnNext").textContent = back
-      ? back+"問が明日また出ます。ここで閉じて大丈夫です。"
-      : "全部できました。この10問は間隔を空けて出します。";
-    return;
-  }
-
-  s.i=s.results.length;
-  const q=BY_ID[s.ids[s.i]];
-  picked=null; checked=false;
-
-  // 初見は原文を読んで4択。2周目以降は論点だけで思い出す。
-  const recallMode = !!state.items[q.id] && !forceQuiz;
-  $("recallBody").classList.toggle("hide",!recallMode);
-  $("quizBody").classList.toggle("hide",recallMode);
-  for(const b of $("recall").children){ b.disabled=false; b.className=""; }
-
-  $("qTitle").textContent=YEAR_LABEL[q.year]+" 問"+q.no;
-  $("qField").textContent=q.field;
-  $("qTopic").textContent=q.topic;
-  $("qRev").classList.toggle("hide",!state.items[q.id]);
-  $("qPage").textContent="("+YEAR_SEIREKI[q.year]+"年実施) 公式PDFの "+q.page+" ページ目";
-  $("qOpen").href=PDF[q.year]+(USE_PAGE_ANCHOR?"#page="+q.page:"");
-  $("qOpenLabel").textContent=YEAR_LABEL[q.year]+" 問"+q.no+" を開く";
-
-  for(const b of $("keys").children){ b.disabled=false; b.className=""; b.setAttribute("aria-pressed","false"); }
-  $("checkBtn").disabled=true;
-  $("checkBtn").classList.remove("hide");
-  $("resultBox").classList.add("hide");
-  $("afterPdf").classList.add("hide");
-  $("nextBtn").classList.add("hide");
+function barHTML(label, rate, n){
+  const pct = rate === null ? 0 : Math.round(rate*100);
+  const cls = rate === null ? "" : pct < 50 ? "low" : pct < 70 ? "mid" : "";
+  return `<div class="bar">
+    <div class="row"><span>${esc(label)}</span><span>${rate===null?"—":pct+"%"}（${n}問）</span></div>
+    <div class="track"><i class="fill ${cls}" style="width:${pct}%"></i></div></div>`;
 }
 
-function check(){
-  if(checked||picked===null) return;
-  checked=true;
-  const s=state.session, q=BY_ID[s.ids[s.i]], correct=(picked===q.answer);
-
-  for(const b of $("keys").children){
-    b.disabled=true;
-    const v=Number(b.dataset.n);
-    if(v===picked) b.className=correct?"was-ok":"was-ng";
-    else if(v===q.answer&&!correct) b.className="answer";
-  }
-
-  const firstTime=!state.items[q.id];
-  const it=state.items[q.id]||(state.items[q.id]={n:0,ok:0,stage:0,due:null,last:null});
-  it.n++; if(correct) it.ok++;
-  it.last=today();
-  schedule(it,correct?"ok":"ng",firstTime);
-
-  s.results.push(correct);
-  const l=state.log[s.date]||(state.log[s.date]={n:0,ok:0});
-  l.n++; if(correct) l.ok++;
-  save();
-
-  $("verdict").className="verdict "+(correct?"ok":"ng");
-  $("verdict").textContent=correct?"正解":"不正解";
-  $("verdictSub").textContent=correct?"":"正解は "+q.answer;
-  $("verdictWhen").textContent = it.due ? "つぎは "+jp(it.due)+" に出ます"
-    : (firstTime?"復習には入れません":"この問題は卒業です");
-  $("resultBox").classList.remove("hide");
-  $("checkBtn").classList.add("hide");
-  $("nextBtn").classList.remove("hide");
-  $("nextBtn").textContent = s.results.length>=s.ids.length ? "今日の結果へ" : "つぎの問題へ";
-  $("stOk").innerHTML=s.results.filter(Boolean).length+'<small>問</small>';
+function renderBadges(){
+  const days = Object.keys(state.log).sort();
+  let streak = 0, cur = today();
+  while(state.log[cur] && state.log[cur].done){ streak++; cur = addDays(cur,-1); }
+  const total = days.reduce((s,d) => s + (state.log[d].done||0), 0);
+  const b = [];
+  if(streak >= 2) b.push(`🔥 ${streak}日連続`);
+  if(state.log[today()] && state.log[today()].done >= DAILY) b.push("✅ 今日の10問を完了");
+  if(total >= 50) b.push(`🧠 通算${total}問`);
+  const fs = fieldStats();
+  for(const [f,s] of Object.entries(fs)) if(s.n >= 8 && s.rate >= 0.8) b.push(`🏆 ${f} ${Math.round(s.rate*100)}%`);
+  document.getElementById("streakBadges").innerHTML = b.length
+    ? b.map(x => `<span class="badge">${esc(x)}</span>`).join("")
+    : `<p class="muted" style="margin:0">今日1問でも解くと、ここに記録が出ます。</p>`;
 }
 
-// 2周目以降。論点だけ見て思い出せたかを自己採点する。
-function recall(grade){
-  if(checked) return;
-  checked=true;
-  const s=state.session, q=BY_ID[s.ids[s.i]], ok=(grade==="ok");
+/* ================= 演習 ================= */
+let S = null;  // 進行中のセッション
 
-  for(const b of $("recall").children){
-    b.disabled=true;
-    if(b.dataset.r===grade) b.className="chosen";
-  }
+document.getElementById("startOx").onclick = () => startSession("ox");
+document.getElementById("startQuiz").onclick = () => startSession("quiz");
+document.getElementById("quitStudy").onclick = () => { S = null; go("home"); };
 
-  const it=state.items[q.id];
-  it.rn=(it.rn||0)+1; if(ok) it.rok=(it.rok||0)+1;
-  it.last=today();
-  schedule(it,grade,false);
-
-  s.results.push(ok);
-  const l=state.log[s.date]||(state.log[s.date]={n:0,ok:0});
-  l.n++; if(ok) l.ok++;
-  save();
-
-  $("verdict").className="verdict "+(ok?"ok":grade==="ng"?"ng":"");
-  $("verdict").textContent = ok?"説明できた":grade==="mid"?"あやふや":"思い出せない";
-  $("verdictSub").textContent = ok?"":"原文で確認しておくと次に残ります";
-  $("verdictWhen").textContent = it.due ? "つぎは "+jp(it.due)+" に出ます" : "この問題は卒業です";
-  $("resultBox").classList.remove("hide");
-  if(!ok){
-    $("afterPdf").href=PDF[q.year]+(USE_PAGE_ANCHOR?"#page="+q.page:"");
-    $("afterPdf").textContent=YEAR_LABEL[q.year]+" 問"+q.no+" の原文を確認する";
-    $("afterPdf").classList.remove("hide");
-  }
-  $("nextBtn").classList.remove("hide");
-  $("nextBtn").textContent = s.results.length>=s.ids.length ? "今日の結果へ" : "つぎの問題へ";
-  $("stOk").innerHTML=s.results.filter(Boolean).length+'<small>問</small>';
+function startSession(kind, ids){
+  const list = ids ? ids.map(i => ALL[i]).filter(Boolean) : buildSet(kind);
+  if(!list.length){ alert("出せる問題がありませんでした。"); return; }
+  S = { kind, list, i:0, ok:0, startedAt:Date.now() };
+  go("study");
+  renderQuestion();
 }
 
-function renderReview(){
-  const q=queueCounts(), t=today();
-  $("rvToday").innerHTML=q.today+'<small>問</small>';
-  $("rvWait").innerHTML=q.wait+'<small>問</small>';
-  $("rvGrad").innerHTML=q.grad+'<small>問</small>';
+function pdfLink(q){
+  return PDF[q.year] + (USE_PAGE_ANCHOR && q.page ? "#page=" + q.page : "");
+}
+function pdfLabel(q){
+  return q.page ? `公式PDFを開く（${q.page}ページ）` : `公式PDFを開く（問${q.no}を探してください）`;
+}
 
-  const rows=Object.entries(state.items).filter(([,it])=>it.due)
-    .sort((a,b)=>a[1].due.localeCompare(b[1].due))
-    .map(([id,it])=>{
-      const q2=BY_ID[id], when=it.due<=t?"きょう":jp(it.due);
-      return '<div class="row"><span>'+YEAR_LABEL[q2.year]+' 問'+q2.no+'</span>'
-        +'<span class="chip">'+q2.field+'</span>'
-        +'<span class="d">'+when+'　'+it.ok+'/'+it.n+'</span></div>';
+function renderQuestion(){
+  const q = S.list[S.i];
+  document.getElementById("progBar").style.width = (S.i / S.list.length * 100) + "%";
+  const it = item(q.id);
+  S.tStart = Date.now();
+
+  const meta = [];
+  if(q.kind === "quiz"){
+    meta.push(`<span class="tag">${YEAR_LABEL[q.year]} 問${q.no}</span>`);
+    meta.push(`<span class="tag">${esc(q.field)}</span>`);
+    if(q.rough && QTEXT) meta.push(`<span class="tag warnt">校正未了</span>`);
+  }else{
+    meta.push(`<span class="tag">一問一答</span>`);
+  }
+  if(q.topic) meta.push(`<span style="align-self:center">${esc(q.topic)}</span>`);
+  meta.push(`<button class="star ${it.fav?"on":""}" id="favBtn" title="お気に入り">${it.fav?"★":"☆"}</button>`);
+  document.getElementById("qMeta").innerHTML = meta.join("");
+  document.getElementById("favBtn").onclick = () => {
+    it.fav = !it.fav; save(); renderQuestion();
+  };
+
+  const qt = document.getElementById("qText");
+  const body = document.getElementById("qBody");
+
+  if(q.kind === "ox"){
+    qt.textContent = q.q;
+    body.innerHTML = `
+      <div id="verdictHost"></div>
+      <div class="conf ox" id="askBox">
+        <button class="o" data-ans="1" data-conf="sure">○ 確信<small>説明できる</small></button>
+        <button class="x" data-ans="0" data-conf="sure">× 確信<small>説明できる</small></button>
+        <button class="o" data-ans="1" data-conf="guess">○ たぶん<small>自信なし</small></button>
+        <button class="x" data-ans="0" data-conf="guess">× たぶん<small>自信なし</small></button>
+      </div>
+      <div id="explainHost"></div>`;
+    body.querySelectorAll("#askBox button").forEach(b => b.onclick = () => {
+      const said = b.dataset.ans === "1";        // ユーザーが押した○か×か
+      answer(q, said === !!q.a, b.dataset.conf); // 正誤は正解と突き合わせて決める
     });
-  $("rvRows").innerHTML = rows.length?rows.join("")
-    : '<div class="row"><span class="muted">復習の予定はまだありません。</span></div>';
-}
+  }else{
+    const t = QTEXT && QTEXT[q.id];
+    if(t){
+      qt.textContent = t.q;
+    }else{
+      qt.innerHTML = q.page
+        ? `<span class="muted">問題文はこのアプリに入っていません。公式PDFの
+           <b>${q.page}ページ</b>を開いて読み、答えの番号を選んでください。</span>`
+        : `<span class="muted">問題文はこのアプリに入っていません。公式PDFを開いて
+           <b>問${q.no}</b>を読み、答えの番号を選んでください。</span>`;
+    }
+    body.innerHTML = `
+      ${t ? "" : `<a class="btn sub" style="text-decoration:none;margin-bottom:12px"
+                     href="${pdfLink(q)}" target="_blank" rel="noopener">${pdfLabel(q)}</a>`}
+      <div id="verdictHost"></div>
+      <div class="choices" id="choices">
+        ${[1,2,3,4].map(n => `<button class="choice" data-n="${n}">
+            <span class="n">${n}</span><span>${t ? esc(t.c[n-1]) : "選択肢 " + n}</span></button>`).join("")}
+      </div>
+      <div class="conf hide" id="confBox">
+        <button data-conf="sure">確信<small>根拠が言える</small></button>
+        <button data-conf="two">二択で迷った<small>絞れた</small></button>
+        <button data-conf="guess">勘<small>当てずっぽう</small></button>
+      </div>
+      <p class="muted hide" id="pickHint" style="margin:12px 0 0">どのくらい自信がありますか。押すと答え合わせします。</p>
+      <div id="explainHost"></div>`;
 
-/* ---- 一問一答（自作問題） ---- */
-// 問題の並びは増減するので、通し番号ではなく本文から作った鍵で記録する。
-function oqId(item){
-  let h=0; for(const c of item.q) h=(h*31+c.charCodeAt(0))|0;
-  return item.t+"#"+((h>>>0).toString(36));
-}
-let oqCur=null, oqDone=false;
-function oqPick(){
-  const log=state.oq||(state.oq={});
-  // まだ解いていない問題を優先し、次に間違えたことのある問題を回す。
-  const fresh=ORIGINAL.filter(x=>!log[oqId(x)]);
-  const pool=fresh.length ? fresh
-    : ORIGINAL.filter(x=>{const r=log[oqId(x)];return r.ok<r.n;});
-  const from=pool.length?pool:ORIGINAL;
-  return from[Math.floor(Math.random()*from.length)];
-}
-function renderOQ(){
-  const log=state.oq||(state.oq={});
-  const seen=Object.keys(log).length;
-  const n=Object.values(log).reduce((a,x)=>a+x.n,0);
-  const ok=Object.values(log).reduce((a,x)=>a+x.ok,0);
-  $("oqTotal").innerHTML=ORIGINAL.length+'<small>問</small>';
-  $("oqSeen").innerHTML=seen+'<small>問</small>';
-  $("oqRate").textContent=n?Math.round(ok/n*100)+"%":"–";
-
-  oqCur=oqPick(); oqDone=false;
-  $("oqTopic").textContent=oqCur.t;
-  $("oqQ").textContent=oqCur.q;
-  for(const b of $("oqKeys").children){ b.disabled=false; b.className=""; }
-  $("oqResult").classList.add("hide");
-  $("oqNote").classList.add("hide");
-  $("oqNext").classList.add("hide");
-}
-function oqAnswer(v){
-  if(oqDone) return;
-  oqDone=true;
-  const correct=(v===oqCur.a);
-  for(const b of $("oqKeys").children){
-    b.disabled=true;
-    const bv=b.dataset.v==="1";
-    if(bv===v) b.className=correct?"chosen":"";
-    if(bv===oqCur.a) b.className="chosen";
+    let pick = null;
+    body.querySelectorAll(".choice").forEach(b => b.onclick = () => {
+      pick = Number(b.dataset.n);
+      body.querySelectorAll(".choice").forEach(x => x.classList.toggle("on", x === b));
+      document.getElementById("confBox").classList.remove("hide");
+      document.getElementById("pickHint").classList.remove("hide");
+    });
+    body.querySelectorAll("#confBox button").forEach(b => b.onclick = () => {
+      if(!pick) return;
+      answer(q, pick === q.a, b.dataset.conf, pick);
+    });
   }
-  const id=oqId(oqCur);
-  const r=state.oq[id]||(state.oq[id]={n:0,ok:0});
-  r.n++; if(correct) r.ok++;
+}
+
+function answer(q, correct, conf, picked){
+  const it = item(q.id);
+  it.seen++; it.lastAt = today(); it.conf = conf;
+  const ms = Date.now() - S.tStart;
+  it.ms = (it.ms || []).concat(ms).slice(-5);
+  schedule(it, correct, conf);
+  if(correct) S.ok++;
+
+  const d = state.log[today()] || (state.log[today()] = { done:0, ok:0 });
+  d.done++; if(correct) d.ok++;
   save();
-
-  $("oqVerdict").className="verdict "+(correct?"ok":"ng");
-  $("oqVerdict").textContent=correct?"正解":"不正解　答えは "+(oqCur.a?"◯":"✕");
-  $("oqRef").textContent=oqCur.ref;
-  $("oqNote").textContent=oqCur.n;
-  $("oqResult").classList.remove("hide");
-  $("oqNote").classList.remove("hide");
-  $("oqNext").classList.remove("hide");
+  renderVerdict(q, correct, conf, picked);
 }
 
-let topicFilter="すべて";
-function renderTopics(){
-  const keys=["すべて",...FIELDS];
-  $("topicFilters").innerHTML=keys.map(k=>
-    '<button data-f="'+k+'" aria-pressed="'+(k===topicFilter)+'">'+k+'</button>').join("");
-  for(const b of $("topicFilters").children){
-    b.onclick=()=>{ topicFilter=b.dataset.f; renderTopics(); };
+function renderVerdict(q, correct, conf, picked){
+  const it = state.items[q.id];
+  const t = q.kind === "quiz" ? (QTEXT && QTEXT[q.id]) : null;
+  const body = document.getElementById("qBody");
+
+  // 選択肢の色付け
+  if(q.kind === "quiz"){
+    document.querySelectorAll(".choice").forEach(b => {
+      const n = Number(b.dataset.n);
+      b.classList.remove("on");
+      if(n === q.a) b.classList.add("right");
+      else if(n === picked) b.classList.add("wrong");
+      b.onclick = null;
+    });
   }
-  const list=BANK.filter(q=>topicFilter==="すべて"||q.field===topicFilter);
-  $("topicRows").innerHTML=list.map(q=>{
-    const it=state.items[q.id];
-    let mark='<span class="chip">未</span>';
-    if(it) mark = it.ok===it.n ? '<span class="chip ok">正解</span>'
-      : it.ok===0 ? '<span class="chip ng">不正解</span>'
-      : '<span class="chip">'+it.ok+'/'+it.n+'</span>';
-    return '<a class="row" href="'+PDF[q.year]+(USE_PAGE_ANCHOR?"#page="+q.page:"")+'" target="_blank" rel="noopener">'
-      +'<span class="t"><b>'+q.topic+'</b><span>'+YEAR_LABEL[q.year]+' 問'+q.no+'　'+q.field+'</span></span>'
-      +mark+'</a>';
-  }).join("");
-}
 
-function renderRecord(){
-  const t=totals();
-  $("rTotal").innerHTML=t.n+'<small>問</small>';
-  $("rRate").textContent=t.n?Math.round(t.ok/t.n*100)+"%":"–";
-  $("rSeen").innerHTML=t.seen+'<small>/ '+BANK.length+'</small>';
-  $("rStreak").innerHTML=streak()+'<small>日</small>';
-  const rn=Object.values(state.items).reduce((a,x)=>a+(x.rn||0),0);
-  const rok=Object.values(state.items).reduce((a,x)=>a+(x.rok||0),0);
-  $("rRecall").textContent=rn?Math.round(rok/rn*100)+"%":"–";
-  $("rRecallN").innerHTML=rn+'<small>回</small>';
-  $("rFieldBars").innerHTML=barsHtml(FIELDS.map(f=>[f,rateBy(q=>q.field===f)]));
-  $("rYearBars").innerHTML=barsHtml(YEARS.map(y=>[YEAR_LABEL[y],rateBy(q=>q.year===y)]));
+  document.querySelectorAll("#confBox, #pickHint, #askBox").forEach(el => el.classList.add("hide"));
 
-  const days=Object.keys(state.log).sort().reverse().slice(0,14);
-  $("rLog").innerHTML = days.length ? days.map(d=>{
-    const l=state.log[d];
-    return '<div class="row"><span>'+d.replace(/-/g,"/")+'</span>'
-      +'<span class="chip">'+l.n+'問</span>'
-      +'<span class="d">正解 '+l.ok+'　'+Math.round(l.ok/l.n*100)+'%</span></div>';
-  }).join("") : '<div class="row"><span class="muted">まだ記録がありません。</span></div>';
-}
+  const guessy = correct && conf === "guess";
+  const lead = correct ? (guessy ? "当たりましたが、まだ身についていません" : "正解") : "不正解";
+  const sub = correct
+    ? (guessy ? "勘で当たった問題は、明後日もう一度戻します。段は進めません。" : nextText(it))
+    : "明日もう一度戻します。";
 
-/* ================= 操作 ================= */
-for(const b of $("nav").children) b.onclick=()=>go(b.dataset.view);
-$("startBtn").onclick=()=>go("study");
-for(const b of $("keys").children){
-  b.onclick=()=>{
-    if(checked) return;
-    picked=Number(b.dataset.n);
-    for(const x of $("keys").children) x.setAttribute("aria-pressed", x===b ? "true":"false");
-    $("checkBtn").disabled=false;
+  document.getElementById("verdictHost").innerHTML =
+    `<div class="verdict ${correct && !guessy ? "ok" : correct ? "" : "ng"}">
+      <span class="mark">${correct ? "○" : "×"}</span>
+      <span><span class="lead">${lead}</span><br><span class="sub">${esc(sub)}</span></span>
+    </div>` + (q.kind === "quiz" ? `<p style="margin:0 0 12px"><b>正解は ${q.a}</b></p>` : "");
+
+  const html = [];
+  if(q.kind === "quiz"){
+    if(NOTES[q.id]) html.push(`<div class="note trap"><b>この問題について</b>${esc(NOTES[q.id])}</div>`);
+    if(q.topic) html.push(`<div class="note"><b>論点</b>${esc(q.topic)}</div>`);
+    if(q.trap)  html.push(`<div class="note trap"><b>この問題の罠</b>${esc(q.trap)}</div>`);
+    if(!t){
+      html.push(`<a class="btn sub" style="text-decoration:none;margin:10px 0"
+                    href="${pdfLink(q)}" target="_blank" rel="noopener">${pdfLabel(q)}</a>`);
+    }
+    if(q.rough && QTEXT){
+      html.push(`<p class="muted">この年度の問題文は読み取りの誤字が残っている場合があります。
+                 迷ったら公式PDFで確かめてください。</p>`);
+    }
+  }else{
+    html.push(`<div class="note"><b>答え</b>${q.a ? "○" : "×"}　${esc(q.n)}</div>`);
+    html.push(`<div class="note"><b>根拠</b>${esc(q.ref)}</div>`);
+  }
+
+  // 間違えた理由
+  if(!correct){
+    html.push(`<h3 style="margin:16px 0 6px">なぜ外しましたか（任意）</h3>
+      <div class="reasons" id="reasons">
+        <button data-r="know">知識がなかった</button>
+        <button data-r="misread">問題文を読み違えた</button>
+        <button data-r="number">数字・期間を取り違えた</button>
+        <button data-r="skip">答えない</button>
+      </div>`);
+  }
+  const sameTopic = q.topic
+    ? QUIZ_ITEMS.filter(x => x.topic === q.topic && x.id !== q.id)
+    : [];
+  if(sameTopic.length){
+    html.push(`<h3 style="margin:16px 0 6px">同じ論点の問題</h3>
+      <div class="list">${sameTopic.slice(0,4).map(x =>
+        `<div class="row"><span class="id">${YEAR_LABEL[x.year].replace("年度","")} 問${x.no}</span>
+         <span class="tp">${esc(x.field)}</span></div>`).join("")}</div>`);
+  }
+
+  const last = S.i >= S.list.length - 1;
+  html.push(`<div class="btns" style="margin-top:18px">
+      <button class="btn" id="nextBtn">${last ? "おわり" : "次の問題（" + (S.i+2) + "/" + S.list.length + "）"}</button>
+    </div>`);
+
+  document.getElementById("explainHost").innerHTML = html.join("");
+  document.getElementById("explainHost").scrollIntoView({block:"nearest"});
+
+  if(!correct){
+    document.querySelectorAll("#reasons button").forEach(b => b.onclick = () => {
+      document.querySelectorAll("#reasons button").forEach(x => x.classList.toggle("on", x === b));
+      const r = b.dataset.r;
+      if(r !== "skip"){ it.reasons[r] = (it.reasons[r]||0) + 1; save(); }
+    });
+  }
+  document.getElementById("nextBtn").onclick = () => {
+    if(last) finish(); else { S.i++; renderQuestion(); }
   };
 }
-$("checkBtn").onclick=check;
-for(const b of $("recall").children) b.onclick=()=>recall(b.dataset.r);
-for(const b of $("oqKeys").children) b.onclick=()=>oqAnswer(b.dataset.v==="1");
-$("oqNext").onclick=()=>{ renderOQ(); window.scrollTo(0,0); };
-$("toQuiz").onclick=()=>{ forceQuiz=true; renderStudy(); };
-$("nextBtn").onclick=()=>{ forceQuiz=false; save(); renderStudy(); window.scrollTo(0,0); };
-$("examDate").onchange=e=>{ state.examDate=e.target.value||DEFAULT_EXAM; save(); renderHome(); };
-$("resetBtn").onclick=()=>{
-  if(!confirm("解いた記録と復習の予定をすべて消します。よろしいですか。")) return;
-  localStorage.removeItem(KEY);
-  state=load();
-  $("examDate").value=state.examDate;
-  go("home");
+
+function nextText(it){
+  if(!it.due) return "この問題は卒業です。もう戻ってきません。";
+  const d = daysBetween(today(), it.due);
+  return `次は${d}日後に戻します。`;
+}
+
+function finish(){
+  const n = S.list.length, ok = S.ok;
+  const body = document.getElementById("qBody");
+  document.getElementById("progBar").style.width = "100%";
+  document.getElementById("qMeta").innerHTML = "";
+  document.getElementById("qText").innerHTML =
+    `<b style="font-size:1.2rem">おつかれさまでした</b>`;
+  const guessed = S.list.filter(q => state.items[q.id] && state.items[q.id].conf === "guess").length;
+  body.innerHTML = `
+    <p style="margin:0 0 6px">${n}問中 <b>${ok}問</b> 正解。</p>
+    ${guessed ? `<p class="muted" style="margin:0 0 12px">うち${guessed}問は自信がないまま答えました。数日後にまた出します。</p>` : ""}
+    <div class="btns">
+      <button class="btn" id="againBtn">もう10問</button>
+      <button class="btn sub" id="homeBtn">ホームへ</button>
+    </div>`;
+  document.getElementById("againBtn").onclick = () => startSession(S.kind);
+  document.getElementById("homeBtn").onclick = () => { S = null; go("home"); };
+  save();
+}
+
+/* ================= 復習 ================= */
+function rowHTML(q, right){
+  const label = q.kind === "quiz"
+    ? `${YEAR_LABEL[q.year].replace("令和","R").replace("年度","")} 問${q.no}`
+    : "一問一答";
+  return `<div class="row" data-id="${q.id}">
+    <span class="id">${label}</span>
+    <span class="tp">${esc(q.topic || (q.kind === "quiz" ? q.field : ""))}</span>
+    <span class="st">${esc(right)}</span></div>`;
+}
+function renderReview(){
+  const t = today();
+  const due = Object.keys(state.items)
+    .filter(id => ALL[id] && state.items[id].due && state.items[id].due <= t)
+    .map(id => ALL[id]);
+  const shaky = Object.keys(state.items).filter(id => ALL[id] && isShaky(id)).map(id => ALL[id]);
+  const fav = Object.keys(state.items).filter(id => ALL[id] && state.items[id].fav).map(id => ALL[id]);
+
+  fill("dueList", due, q => {
+    const it = state.items[q.id];
+    return it.wrong ? `${it.wrong}回まちがえた` : "期日";
+  }, "今日戻ってくる問題はありません。");
+  fill("shakyList", shaky, q => {
+    const it = state.items[q.id];
+    if(it.conf === "guess") return "勘で正解";
+    return it.wrong ? `${it.wrong}回まちがえた` : "あやふや";
+  }, "取りこぼしはありません。");
+  fill("favList", fav, () => "★", "お気に入りはまだありません。");
+}
+function fill(id, list, rightFn, empty){
+  const el = document.getElementById(id);
+  if(!list.length){ el.innerHTML = `<p class="muted" style="margin:0">${empty}</p>`; return; }
+  el.innerHTML = list.slice(0,40).map(q => rowHTML(q, rightFn(q))).join("")
+    + (list.length > 40 ? `<p class="muted" style="margin:6px 0 0">ほか${list.length-40}問</p>` : "");
+  if(list.length){
+    el.insertAdjacentHTML("beforeend",
+      `<button class="btn" style="margin-top:10px" data-run="${id}">この中から10問やる</button>`);
+    el.querySelector("[data-run]").onclick = () => {
+      const ids = shuffle(list).slice(0,DAILY).map(q => q.id);
+      startSession(list[0].kind, ids);
+    };
+  }
+}
+
+/* ================= 成績 ================= */
+function renderStats(){
+  const q = accuracy(QUIZ_ITEMS), o = accuracy(OX_ITEMS);
+  const days = Object.keys(state.log).length;
+  const total = Object.values(state.log).reduce((s,d) => s + (d.done||0), 0);
+  document.getElementById("totals").innerHTML = [
+    ["解いた延べ問数", total + "問"],
+    ["学習した日数", days + "日"],
+    ["四択 正答率", q.n ? Math.round(q.rate*100) + "%（" + q.n + "問）" : "—"],
+    ["一問一答 正答率", o.n ? Math.round(o.rate*100) + "%（" + o.n + "問）" : "—"]
+  ].map(([k,v]) => `<div><span>${k}</span><span>${v}</span></div>`).join("");
+
+  const fs = fieldStats();
+  document.getElementById("byField").innerHTML =
+    Object.entries(fs).map(([f,s]) => barHTML(f, s.rate, s.n)).join("");
+
+  const w = weakTopics(1).slice(0,8);
+  document.getElementById("byTopic").innerHTML = w.length
+    ? w.map(o2 => barHTML(o2.topic, o2.rate, o2.n)).join("")
+    : `<p class="muted" style="margin:0">まだ判定できません。</p>`;
+
+  const rows = [];
+  for(let i=6;i>=0;i--){
+    const d = addDays(today(), -i);
+    const l = state.log[d] || { done:0, ok:0 };
+    rows.push(`<div class="bar">
+      <div class="row"><span>${d.slice(5).replace("-","/")}</span>
+      <span>${l.done}問${l.done?"（正解"+l.ok+"）":""}</span></div>
+      <div class="track"><i class="fill" style="width:${Math.min(100, l.done*10)}%"></i></div></div>`);
+  }
+  document.getElementById("last7").innerHTML = rows.join("");
+}
+
+/* ================= 論点一覧 ================= */
+function renderTopics(){
+  const map = {};
+  for(const q of QUIZ_ITEMS){
+    if(!q.topic) continue;
+    (map[q.topic] || (map[q.topic] = [])).push(q);
+  }
+  const el = document.getElementById("topicList");
+  const keys = Object.keys(map).sort();
+  el.innerHTML = keys.map(t => {
+    const list = map[t];
+    const a = accuracy(list);
+    const ids = list.map(q => `${YEAR_LABEL[q.year].replace("令和","R").replace("年度","")}問${q.no}`).join("・");
+    return `<div class="row" data-topic="${esc(t)}">
+      <span class="tp"><b>${esc(t)}</b><br><span class="muted">${ids}</span></span>
+      <span class="st">${a.n ? Math.round(a.rate*100)+"%" : "未"}</span></div>`;
+  }).join("");
+  el.querySelectorAll("[data-topic]").forEach(row => row.onclick = () => {
+    const t = row.dataset.topic;
+    const ids = map[t].map(q => q.id);
+    startSession("quiz", ids);
+  });
+}
+
+/* ================= 設定 ================= */
+document.getElementById("examDate").onchange = e => {
+  state.examDate = e.target.value || DEFAULT_EXAM; save(); renderCountdown();
+};
+document.getElementById("resetBtn").onclick = () => {
+  if(!confirm("記録を全部消します。戻せません。よろしいですか。")) return;
+  localStorage.removeItem(KEY); localStorage.removeItem(OLD_KEY);
+  state = blank(); save(); go("home");
+};
+const ioBox = document.getElementById("ioBox");
+document.getElementById("expBtn").onclick = () => {
+  ioBox.classList.remove("hide");
+  ioBox.value = JSON.stringify(state);
+  ioBox.select();
+};
+document.getElementById("impBtn").onclick = () => {
+  if(ioBox.classList.contains("hide")){ ioBox.classList.remove("hide"); ioBox.focus(); return; }
+  try{
+    const s = JSON.parse(ioBox.value);
+    if(!s || !s.items) throw new Error("形式が違います");
+    if(!confirm("いまの記録を、貼り付けた控えで置き換えます。よろしいですか。")) return;
+    state = s; save(); alert("戻しました。"); go("home");
+  }catch(e){ alert("読み取れませんでした。控えの文字列をそのまま貼り付けてください。"); }
 };
 
-$("examDate").value=state.examDate;
+/* ================= 雑 ================= */
+function esc(s){
+  return String(s == null ? "" : s)
+    .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
+
+if("serviceWorker" in navigator && location.protocol.startsWith("http")){
+  window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(()=>{}));
+}
+
 go("home");
 </script>
 </body>
